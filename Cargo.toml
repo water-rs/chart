@@ -1,33 +1,48 @@
 [package]
 name = "waterui-chart"
 version = "0.1.0"
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-readme = "../../../README.md"
-repository.workspace = true
+edition = "2024"
+rust-version = "1.95"
+authors = ["Lexo Liu <me@lexo.cool>"]
+license = "Apache-2.0 OR MIT"
+readme = "README.md"
+repository = "https://github.com/water-rs/chart"
 description = "Chart components for WaterUI with GPU-accelerated rendering"
 keywords = ["chart", "visualization", "gpu", "waterui"]
 categories = ["gui", "visualization"]
+
+[lints.rust]
+missing_docs = "warn"
+missing_debug_implementations = "warn"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+style = { level = "warn", priority = -1 }
+correctness = { level = "warn", priority = -1 }
+complexity = { level = "warn", priority = -1 }
+suspicious = { level = "warn", priority = -1 }
+perf = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+undocumented_unsafe_blocks = "warn"
+multiple_crate_versions = "allow"
 
 [features]
 default = []
 
 [dependencies]
-waterui-core.workspace = true
-waterui-graphics.workspace = true
-waterui-canvas.workspace = true
-waterui-layout.workspace = true
-waterui-shape.workspace = true
-waterui-text.workspace = true
-nami.workspace = true
+waterui-core = { version = "0.3.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+waterui-graphics = { version = "0.3.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+waterui-canvas = { version = "0.1.0", git = "https://github.com/water-rs/canvas.git", branch = "dev" }
+waterui-layout = { version = "0.3.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+waterui-shape = { version = "0.1.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+waterui-text = { version = "0.3.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+nami = "0.11.0"
 bytemuck = { version = "1.25", features = ["derive"] }
 num-traits = { version = "0.2", default-features = false }
 
 [dev-dependencies]
-hydrolysis-m3 = { path = "../../../backends/hydrolysis_m3" }
-waterui-testing = { path = "../../../testing" }
-waterui = { path = "../../.." }
-
-[lints]
-workspace = true
+hydrolysis-m3 = { git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+waterui-testing = { git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+waterui = { git = "https://github.com/water-rs/waterui.git", branch = "dev" }
