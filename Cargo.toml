@@ -32,17 +32,17 @@ multiple_crate_versions = "allow"
 default = []
 
 [dependencies]
-waterui-core = { version = "0.3.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
-waterui-graphics = { version = "0.3.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
-waterui-canvas = { version = "0.1.0", git = "https://github.com/water-rs/canvas.git", branch = "dev" }
-waterui-layout = { version = "0.3.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
-waterui-shape = { version = "0.1.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
-waterui-text = { version = "0.3.0", git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+waterui-core = { version = "0.3.0" }
+waterui-graphics = { version = "0.3.0" }
+waterui-canvas = "0.1.0"
+waterui-layout = { version = "0.3.0" }
+waterui-shape = { version = "0.1.0" }
+waterui-text = { version = "0.3.0" }
 nami = "0.11.0"
 bytemuck = { version = "1.25", features = ["derive"] }
 num-traits = { version = "0.2", default-features = false }
 
 [dev-dependencies]
-hydrolysis-m3 = { git = "https://github.com/water-rs/waterui.git", branch = "dev" }
-waterui-testing = { git = "https://github.com/water-rs/waterui.git", branch = "dev" }
-waterui = { git = "https://github.com/water-rs/waterui.git", branch = "dev" }
+hydrolysis-m3 = "0.1.0"
+waterui-testing = "0.3.0"
+waterui = "0.3.0"
