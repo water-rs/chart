@@ -821,6 +821,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "chart-example"
+version = "0.1.0"
+dependencies = [
+ "hydrolysis-m3",
+ "waterui",
+ "waterui-chart",
+ "waterui-testing",
+]
+
+[[package]]
 name = "clang-sys"
 version = "1.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

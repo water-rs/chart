@@ -1,3 +1,7 @@
+[workspace]
+members = ["examples/chart"]
+resolver = "2"
+
 [package]
 name = "waterui-chart"
 version = "0.1.0"

@@ -1,0 +1,17 @@
+[package]
+name = "chart-example"
+version = "0.1.0"
+edition = "2021"
+authors = ["Lexo Liu"]
+publish = false
+
+[features]
+dev = ["waterui/dynamic_linking"]
+
+[dependencies]
+waterui = "0.4.0"
+waterui-chart = { path = "../.." }
+
+[dev-dependencies]
+waterui-testing = "0.4.0"
+hydrolysis-m3 = "0.1.1"
