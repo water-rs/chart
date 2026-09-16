@@ -51,12 +51,38 @@ hydrolysis-m3 = "0.2.0"
 waterui-testing = "0.4.1"
 waterui = "0.4.1"
 
-# The WaterUI packages above come from crates.io, so this repository builds
-# against the same released APIs its users get. The third-party pins below are
-# the framework's own: the published `waterui-graphics` was built with these
-# forks, and dropping them here would render this crate's tests through
-# different code than the framework runs.
+# Coordinate the proposal-aware framework and renderer APIs at exact revisions.
 [patch.crates-io]
+waterui = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-assets = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-assets-macros = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-assets-planner = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-backend-core = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-controls = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-core = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-dylib = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-form = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-graphics = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-icon = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-inspector-protocol = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-internal = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-layout = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-locale = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-macros = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-map = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-media = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-navigation = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-preview-protocol = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-shape = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-testing = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-text = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-url = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-video = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-watcher-set = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+waterui-webview = { git = "https://github.com/water-rs/waterui", rev = "a5c4f13d7d012f20168227453adb95c61f4f4afd" }
+hydrolysis = { git = "https://github.com/water-rs/hydrolysis", rev = "5aed6ec96cbc078be481fb80cf63ecc06fef81d4" }
+waterui-chart = { path = "." }
+hydrolysis-m3 = { git = "https://github.com/water-rs/hydrolysis-m3", rev = "57b522478f4a2b536e470a690532985774f4a8dd" }
 xcb = { git = "https://github.com/rust-x-bindings/rust-xcb", rev = "ae3b2cd080e78173223038ccbebdc644eaf4a9ad" }
 vello = { git = "https://github.com/lexoliu/vello", rev = "5e5f538556be16527f67379b105af82f408b747d" }
 vello_hybrid = { git = "https://github.com/lexoliu/vello", rev = "d68d9e9825bcd1ffee762323881c13a2e7a3f639" }
