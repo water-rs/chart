@@ -9,9 +9,9 @@ publish = false
 dev = ["waterui/dynamic_linking"]
 
 [dependencies]
-waterui = "0.4.0"
+waterui.workspace = true
 waterui-chart = { path = "../.." }
 
 [dev-dependencies]
-waterui-testing = "0.4.0"
-hydrolysis-m3 = "0.1.1"
+waterui-testing.workspace = true
+hydrolysis-m3.workspace = true
