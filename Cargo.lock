@@ -819,7 +819,7 @@ dependencies = [
 name = "chart-example"
 version = "0.1.0"
 dependencies = [
- "hydrolysis-m3 0.1.1",
+ "hydrolysis-m3",
  "waterui",
  "waterui-chart",
  "waterui-testing",
@@ -2377,23 +2377,6 @@ dependencies = [
  "waterui-text",
  "waterui-webview",
  "wgpu",
-]
-
-[[package]]
-name = "hydrolysis-m3"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1887692df400f25d7858ca5e823d7336a5b345ca665149ca1481226b24bb5553"
-dependencies = [
- "material-color-utils",
- "num-traits",
- "vello",
- "waterui",
- "waterui-backend-core",
- "waterui-controls",
- "waterui-core",
- "waterui-form",
- "waterui-graphics",
 ]
 
 [[package]]
@@ -6829,7 +6812,7 @@ name = "waterui-chart"
 version = "0.2.0"
 dependencies = [
  "bytemuck",
- "hydrolysis-m3 0.2.1",
+ "hydrolysis-m3",
  "nami",
  "num-traits",
  "waterui",
@@ -7170,7 +7153,7 @@ dependencies = [
  "accesskit",
  "executor-core",
  "hydrolysis",
- "hydrolysis-m3 0.2.1",
+ "hydrolysis-m3",
  "image",
  "pollster 1.0.1",
  "serde_json",
