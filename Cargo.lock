@@ -6794,9 +6794,8 @@ dependencies = [
 
 [[package]]
 name = "waterui-canvas"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88eed93e8209a01b99d9ea05afc3d526cfa5562530647d1d2f0f85ed88ea8384"
+version = "0.2.0"
+source = "git+https://github.com/water-rs/canvas?rev=ccf13f024aafa4ba74d09b5d94e976af88d62bbb#ccf13f024aafa4ba74d09b5d94e976af88d62bbb"
 dependencies = [
  "image",
  "kurbo",
@@ -8600,8 +8599,3 @@ dependencies = [
  "syn 3.0.5",
  "winnow",
 ]
-
-[[patch.unused]]
-name = "waterui-canvas"
-version = "0.1.1"
-source = "git+https://github.com/water-rs/canvas?rev=0e5c6be29c3619435b9933f83c68474915929ea6#0e5c6be29c3619435b9933f83c68474915929ea6"
