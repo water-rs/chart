@@ -128,9 +128,9 @@ pub fn snapshot_suite(name: &str) -> String {
 
 pub fn chart_surface<V: View>(name: &str, chart: V) -> impl View {
     chart
-        .size(CHART_WIDTH, CHART_HEIGHT)
         .a11y_label(chart_label(name))
         .a11y_role(AccessibilityRole::Image)
+        .size(CHART_WIDTH, CHART_HEIGHT)
 }
 
 pub fn semantic_chart_shell<V: View, F: View, S: View>(
