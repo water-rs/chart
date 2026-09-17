@@ -7,6 +7,7 @@ use waterui_core::accessibility::{AccessibilityLabel, AccessibilityRole};
 use waterui_core::{AnyView, Environment, Metadata, View};
 use waterui_layout::background::background;
 use waterui_layout::overlay::Overlay;
+use waterui_layout::stack::zstack;
 
 use crate::interaction::{ChartAnchor, ChartViewport, HitResult, SelectionBindings};
 
@@ -147,26 +148,34 @@ impl<T: Clone + PartialEq + 'static> ChartComposition<T> {
         plot_area_frame: Computed<ChartViewport>,
         selection: &SelectionBindings<T>,
     ) -> AnyView {
-        if self.is_empty() {
-            return AnyView::new(chart);
-        }
-
-        let proxy = ChartProxy::new(
-            chart_frame,
-            plot_area_frame,
-            selection.focused_signal(),
-            selection.selected_signal(),
-        );
-        let mut content = AnyView::new(chart);
-        for background_builder in &self.background {
-            let layer = ChartLayerAccessibilityBoundary::new(background_builder(proxy.clone()));
-            content = AnyView::new(background(content, layer));
-        }
-        for overlay_builder in &self.overlay {
-            let layer = ChartLayerAccessibilityBoundary::new(overlay_builder(proxy.clone()));
-            content = AnyView::new(Overlay::new(content, layer));
-        }
-        content
+        let content = if self.is_empty() {
+            AnyView::new(chart)
+        } else {
+            let proxy = ChartProxy::new(
+                chart_frame,
+                plot_area_frame,
+                selection.focused_signal(),
+                selection.selected_signal(),
+            );
+            let mut content = AnyView::new(chart);
+            for background_builder in &self.background {
+                let layer = ChartLayerAccessibilityBoundary::new(background_builder(proxy.clone()));
+                content = AnyView::new(background(content, layer));
+            }
+            for overlay_builder in &self.overlay {
+                let layer = ChartLayerAccessibilityBoundary::new(overlay_builder(proxy.clone()));
+                content = AnyView::new(Overlay::new(content, layer));
+            }
+            content
+        };
+        // A chart is one accessibility element. This single-child container is
+        // the innermost scope owner: naming metadata applied to the chart
+        // resolves onto one node at the chart's own bounds, while the canvas
+        // leaf, its gesture observer, and every composed layer render under
+        // the scope's child environment instead of each repeating the name.
+        // Without naming metadata the container emits nothing and is
+        // layout-transparent, so unnamed charts are unaffected.
+        AnyView::new(zstack((content,)))
     }
 }
 
