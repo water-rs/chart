@@ -4,8 +4,8 @@ resolver = "2"
 
 [workspace.dependencies]
 hydrolysis-m3 = "0.3.0"
-waterui-testing = "0.4.1"
-waterui = "0.4.1"
+waterui-testing = "0.5.0"
+waterui = "0.5.0"
 
 [package]
 name = "waterui-chart"
@@ -41,12 +41,12 @@ multiple_crate_versions = "allow"
 default = []
 
 [dependencies]
-waterui-core = { version = "0.3.2" }
-waterui-graphics = { version = "0.4.1" }
+waterui-core = { version = "0.5.0" }
+waterui-graphics = { version = "0.5.0" }
 waterui-canvas = "0.2.0"
-waterui-layout = { version = "0.3.2" }
-waterui-shape = { version = "0.1.2" }
-waterui-text = { version = "0.4.1" }
+waterui-layout = { version = "0.5.0" }
+waterui-shape = { version = "0.5.0" }
+waterui-text = { version = "0.5.0" }
 nami = "0.11.2"
 bytemuck = { version = "1.25", features = ["derive"] }
 num-traits = { version = "0.2", default-features = false }
@@ -56,52 +56,9 @@ hydrolysis-m3.workspace = true
 waterui-testing.workspace = true
 waterui.workspace = true
 
-# Until waterui 0.5.0 is on crates.io the framework is consumed by revision
-# pin; every waterui-* crate this graph resolves comes from the same
-# release-candidate commit so the graph carries exactly one copy of each.
+# Third-party forks the framework's own patch table carries; a dependency's
+# patch table does not propagate downstream, so they are repeated here.
 [patch.crates-io]
-waterui-svg = { git = "https://github.com/water-rs/svg", rev = "79493d096341faf630e03350f22db73c07bb3b3a" }
-waterui = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-assets = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-assets-core = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-assets-macros = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-assets-planner = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-backend-core = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-controls = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-core = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-dylib = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-form = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-graphics = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-icon = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-inspector-protocol = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-internal = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-layout = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-locale = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-macros = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-map = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-media = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-navigation = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-preview-protocol = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-shape = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-testing = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-text = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-url = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-video = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-watcher-set = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-webview = { git = "https://github.com/water-rs/waterui", rev = "f3f58c48f553c0eb198338fcfd79341e5973c0ed" }
-waterui-chart = { path = "." }
-# Wave satellites this graph resolves, pinned to their `dev` HEADs. While the
-# pins stand, every requirement names the version the pinned revision declares;
-# the release commit drops the pins and bumps requirements to the wave versions
-# (0.5.0 foundation, 0.3.0 hydrolysis*, …) once waterui 0.5.0 is on crates.io.
-# `waterui-svg` is not patched here because `waterui-internal` names it by a
-# direct git dependency, which a patch cannot redirect.
-waterui-canvas = { git = "https://github.com/water-rs/canvas", rev = "6ebc84d19347334390192029e8054eafe2ccbac0" }
-waterui-image = { git = "https://github.com/water-rs/image", rev = "a1632420ddecde008bde3fe392eee0d9f660d67a" }
-hydrolysis = { git = "https://github.com/water-rs/hydrolysis", rev = "bfc274137889ea69f284edc8ec1c1831afa97e30" }
-hydrolysis-m3 = { git = "https://github.com/water-rs/hydrolysis-m3", rev = "6a9981926ba3af16bed33b179365ff2d8a85ed05" }
-# Third-party forks the framework's own patch table carries; git dependencies
-# do not propagate it, so they are repeated here.
 xcb = { git = "https://github.com/rust-x-bindings/rust-xcb", rev = "ae3b2cd080e78173223038ccbebdc644eaf4a9ad" }
 vello = { git = "https://github.com/lexoliu/vello", rev = "5e5f538556be16527f67379b105af82f408b747d" }
 vello_hybrid = { git = "https://github.com/lexoliu/vello", rev = "d68d9e9825bcd1ffee762323881c13a2e7a3f639" }
