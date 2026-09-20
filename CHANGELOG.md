@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0](https://github.com/water-rs/chart/compare/v0.2.0...v0.3.0) - 2026-09-20
+
+### Fixed
+
+- *(a11y)* own the chart naming scope at the chart's bounds
+- *(example)* share compatible framework and theme dependencies
+- *(deps)* use corrected list viewport backend
+- *(layout)* retain axis child placement proposals
+- *(ci)* release with the water-rs release-plz fork and the shared Linux deps
+
+### Other
+
+- adopt the 0.5.0 framework wave (0.3.0) ([#22](https://github.com/water-rs/chart/pull/22))
+- publish on the main push, not under workflow_run ([#21](https://github.com/water-rs/chart/pull/21))
+- pin hydrolysis at the naming-scope bounds fix (water-rs/hydrolysis#50)
+- Revert "test: wrap the chart surface in a stack so its a11y bounds match the chart"
+- wrap the chart surface in a stack so its a11y bounds match the chart
+- pin the framework at f3f58c48f (0.5.0 release candidate)
+- let the PR source gate accept release-plz release branches ([#19](https://github.com/water-rs/chart/pull/19))
+- name the requirements the pinned revisions provide
+- adopt waterui 0.5.0 and name waterui-chart 0.3.0
+- validate chart with the full layout conformance revision
+- Merge commit '37b8471a9a593b7787ccc607a83e8fc1a66dbb41' into codex/proposal-aware-placement
+- disable incremental builds and trim debuginfo ([#14](https://github.com/water-rs/chart/pull/14))
+- run tests with cargo nextest ([#13](https://github.com/water-rs/chart/pull/13))
+- Merge pull request #11 from water-rs/build/registry-deps
+- consume the framework from crates.io
+- publish to crates.io via OIDC trusted publishing ([#7](https://github.com/water-rs/chart/pull/7))
+- gate pull requests into main so only dev may merge ([#8](https://github.com/water-rs/chart/pull/8))
+
 ## [0.2.0](https://github.com/water-rs/chart/compare/v0.1.0...v0.2.0) - 2026-09-11
 
 ### Added
