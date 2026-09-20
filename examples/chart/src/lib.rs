@@ -495,12 +495,12 @@ pub fn app(env: Environment) -> App {
 mod tests {
     use super::demo;
     use core::time::Duration;
-    use hydrolysis_m3::install;
+    use hydrolysis_m3::Material3;
 
     /// The chart demo renders through the Hydrolysis M3 GPU pipeline without
     /// panicking (regression guard for the >64 rebuild-loop crash) and the active
     /// chart's controls are present.
-    #[waterui::test(demo, theme = install, viewport = (440, 920), offscreen)]
+    #[waterui::test(demo, theme = Material3::defaults(), viewport = (440, 920), offscreen)]
     fn chart_demo_renders_without_crashing(app: &mut waterui_testing::OffscreenApp) {
         assert!(
             app.query()
@@ -519,7 +519,7 @@ mod tests {
     /// - **Bug 2** (layout flickered): switching to a different-size chart must
     ///   reflow the surrounding spacers cleanly via incremental relayout, with no
     ///   whole-window rebuild flash, and still render the new chart.
-    #[waterui::test(demo, theme = install, viewport = (440, 920), offscreen)]
+    #[waterui::test(demo, theme = Material3::defaults(), viewport = (440, 920), offscreen)]
     fn chart_mode_buttons_switch_and_reflow(app: &mut waterui_testing::OffscreenApp) {
         assert!(
             app.query()
