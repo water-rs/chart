@@ -20,7 +20,7 @@ use waterui_layout::container::{FixedContainer, LazyContainer};
 use waterui_layout::padding::{EdgeInsets, Padding};
 use waterui_layout::{
     AbsoluteLayout, Layout, Point, PositionExt, ProposalSize, Rect, Size, StretchAxis, SubView,
-    UnitPoint, absolute,
+    SubviewPlacement, UnitPoint, absolute,
 };
 use waterui_text::{Text, text};
 
@@ -295,7 +295,12 @@ impl Layout for ReactiveAxisLayout {
         )
     }
 
-    fn place(&self, bounds: Rect, children: &[&dyn SubView]) -> Vec<Rect> {
+    fn place(
+        &self,
+        bounds: Rect,
+        _proposal: ProposalSize,
+        children: &[&dyn SubView],
+    ) -> Vec<SubviewPlacement> {
         let [child] = children else {
             panic!("reactive axis item must contain exactly one child");
         };
@@ -309,25 +314,31 @@ impl Layout for ReactiveAxisLayout {
                 let y = size
                     .height
                     .mul_add(-0.5, (1.0 - position).mul_add(chart_height, chart_top));
-                vec![Rect::new(Point::new(x, y), size)]
+                vec![SubviewPlacement::new(
+                    Rect::new(Point::new(x, y), size),
+                    ProposalSize::UNSPECIFIED,
+                )]
             } else {
                 let x = size
                     .width
                     .mul_add(-0.5, position.mul_add(chart_width, chart_left));
                 let y = bounds.y() + bounds.height() - self.padding.bottom + 5.0 - size.height;
-                vec![Rect::new(Point::new(x, y), size)]
+                vec![SubviewPlacement::new(
+                    Rect::new(Point::new(x, y), size),
+                    ProposalSize::UNSPECIFIED,
+                )]
             }
         } else if self.vertical {
             let y = (1.0 - position).mul_add(chart_height, chart_top);
-            vec![Rect::new(
-                Point::new(chart_left, y - 0.5),
-                Size::new(chart_width, 1.0),
+            vec![SubviewPlacement::new(
+                Rect::new(Point::new(chart_left, y - 0.5), Size::new(chart_width, 1.0)),
+                ProposalSize::new(Some(chart_width), Some(1.0)),
             )]
         } else {
             let x = position.mul_add(chart_width, chart_left);
-            vec![Rect::new(
-                Point::new(x - 0.5, chart_top),
-                Size::new(1.0, chart_height),
+            vec![SubviewPlacement::new(
+                Rect::new(Point::new(x - 0.5, chart_top), Size::new(1.0, chart_height)),
+                ProposalSize::new(Some(1.0), Some(chart_height)),
             )]
         }
     }
@@ -471,3 +482,62 @@ pub trait ChartExt: View + Sized {
 }
 
 impl<V: View + Sized> ChartExt for V {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use waterui_core::layout::ViewDimensions;
+
+    struct Label;
+
+    impl SubView for Label {
+        fn measure(&self, proposal: ProposalSize) -> ViewDimensions {
+            assert_eq!(proposal, ProposalSize::UNSPECIFIED);
+            ViewDimensions::new(Size::new(24.0, 12.0))
+        }
+
+        fn stretch_axis(&self) -> StretchAxis {
+            StretchAxis::None
+        }
+
+        fn priority(&self) -> i32 {
+            0
+        }
+    }
+
+    #[test]
+    fn axis_labels_preserve_ideal_proposals_and_lines_own_their_regions() {
+        let bounds = Rect::new(Point::new(17.0, 31.0), Size::new(300.0, 180.0));
+        for vertical in [false, true] {
+            for label in [false, true] {
+                let layout = ReactiveAxisLayout {
+                    vertical,
+                    label,
+                    position: 0.5,
+                    padding: AxisPadding::default(),
+                };
+                for proposal in [
+                    ProposalSize::UNSPECIFIED,
+                    ProposalSize::new(Some(90.0), Some(50.0)),
+                ] {
+                    let placements = layout.place(bounds, proposal, &[&Label]);
+                    let [placement] = placements.as_slice() else {
+                        panic!("one axis child")
+                    };
+                    if label {
+                        assert_eq!(placement.proposal, ProposalSize::UNSPECIFIED);
+                        assert_eq!(*placement.frame.size(), Size::new(24.0, 12.0));
+                    } else {
+                        assert_eq!(
+                            placement.proposal,
+                            ProposalSize::new(
+                                Some(placement.frame.width()),
+                                Some(placement.frame.height())
+                            )
+                        );
+                    }
+                }
+            }
+        }
+    }
+}

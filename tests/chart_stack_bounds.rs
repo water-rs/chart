@@ -3,7 +3,6 @@
 //! The accessibility bounds and the painted pixels come from the same layout
 //! pass, so asserting on the bounds is a cheap way to keep the two honest.
 
-use hydrolysis_m3::install;
 use waterui::prelude::*;
 use waterui_chart::{DataPoint, LineChart};
 use waterui_testing::{OffscreenApp, Role, ui as test_ui};
@@ -26,7 +25,7 @@ fn a_chart_does_not_flatten_the_rows_beside_it() {
 
     let mut app: OffscreenApp = test_ui()
         .viewport(600, 500)
-        .theme(install)
+        .theme(hydrolysis_m3::Material3::defaults())
         .mount_offscreen(|| {
             vstack((
                 LineChart::new(series()).line_width(1.5).height(160.0),

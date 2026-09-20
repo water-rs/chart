@@ -11,13 +11,13 @@ use waterui_chart::{
     ChartExt, DataBounds, DataPoint, DepthChart, DepthDatum, DepthSide, HitResult, LineChart,
     PieChart, ScatterChart, SliceDatum,
 };
-use waterui_testing::{Role, Selector, UiBuilder, WaitOptions, WaitResult};
+use waterui_testing::{Role, Selector, Styled, UiBuilder, WaitOptions, WaitResult};
 
 use support::{
-    area_data, area_hit_location, assert_chart_accessibility_ready, bar_hit_location,
-    bubble_hit_location, bubble_series, candle_series, candlestick_hit_location, depth_data,
-    depth_hit_location, pie_data, pie_hit_location, pie_slice_datum, point_hit_location,
-    point_series, readout_view, semantic_chart_shell,
+    area_data, area_hit_location, assert_chart_accessibility_ready, assert_chart_semantic_ready,
+    bar_hit_location, bubble_hit_location, bubble_series, candle_series, candlestick_hit_location,
+    depth_data, depth_hit_location, pie_data, pie_hit_location, pie_slice_datum,
+    point_hit_location, point_series, readout_view, semantic_chart_shell,
 };
 
 fn axis_tick_labels(bounds: DataBounds) -> BTreeSet<String> {
@@ -47,7 +47,7 @@ impl<T> Clone for ExpectedHit<'_, T> {
 impl<T> Copy for ExpectedHit<'_, T> {}
 
 fn assert_chart_semantic_flow<T, V, F>(
-    ui: UiBuilder,
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
     name: &'static str,
     hover_at: (f32, f32),
     expected: ExpectedHit<'_, T>,
@@ -63,7 +63,7 @@ fn assert_chart_semantic_flow<T, V, F>(
     let focused_for_view = focused.clone();
     let selected_for_view = selected.clone();
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = build_chart(focused_for_view.clone(), selected_for_view.clone());
         let focused_readout = readout_view("focused", focused_for_view.clone(), formatter);
         let selected_readout = readout_view("selected", selected_for_view.clone(), formatter);
@@ -136,8 +136,10 @@ fn assert_chart_semantic_flow<T, V, F>(
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_xctest_like_focus_and_selection_flow(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let index = 10;
     let expected = data[index];
@@ -206,7 +208,7 @@ fn line_chart_axes_reactive_updates_accessibility_labels_when_bounds_change(ui: 
         )
     });
 
-    assert_chart_accessibility_ready(&mut app, "line-axes-reactive");
+    assert_chart_semantic_ready(&mut app, "line-axes-reactive");
     app.query()
         .role(Role::LABEL)
         .label(removed_label.clone())
@@ -234,8 +236,8 @@ fn line_chart_axes_reactive_updates_accessibility_labels_when_bounds_change(ui: 
         .assert_not_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn bar_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn bar_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
     let data = point_series();
     let index = 8;
     let expected = data[index];
@@ -262,8 +264,10 @@ fn bar_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
     );
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn scatter_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn scatter_chart_xctest_like_focus_and_selection_flow(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let index = 14;
     let expected = data[index];
@@ -291,8 +295,10 @@ fn scatter_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
     );
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn bubble_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn bubble_chart_xctest_like_focus_and_selection_flow(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = bubble_series();
     let index = 11;
     let expected = data[index];
@@ -321,8 +327,10 @@ fn bubble_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
     );
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn candlestick_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn candlestick_chart_xctest_like_focus_and_selection_flow(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = candle_series();
     let index = 12;
     let expected = data[index];
@@ -355,8 +363,10 @@ fn candlestick_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
     );
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn depth_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn depth_chart_xctest_like_focus_and_selection_flow(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = depth_data();
     let side = DepthSide::Bid;
     let index = 7;
@@ -389,8 +399,10 @@ fn depth_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
     );
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn area_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn area_chart_xctest_like_focus_and_selection_flow(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = area_data();
     let series = 0;
     let index = 4;
@@ -422,8 +434,8 @@ fn area_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
     );
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn pie_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn pie_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
     let data = pie_data();
     let index = 1;
     let value = pie_slice_datum(&data, index);
