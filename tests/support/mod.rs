@@ -13,7 +13,7 @@ use waterui_chart::{
     AreaData, AreaDatum, AreaSeries, BubblePoint, Candle, ChartAnchor, DataBounds, DataPoint,
     DepthData, DepthDatum, DepthLevel, DepthSide, HitResult, SliceDatum, candle_epoch,
 };
-use waterui_testing::{Role, Selector, SemanticApp};
+use waterui_testing::{OffscreenApp, Role, RuntimeDriver, Selector, SemanticApp};
 
 pub const VIEWPORT_WIDTH: u32 = 320;
 pub const VIEWPORT_HEIGHT: u32 = 320;
@@ -178,27 +178,38 @@ pub fn image_selector(name: &str) -> Selector {
         .label(chart_label(name))
 }
 
-pub fn assert_chart_accessibility_ready(app: &mut SemanticApp, name: &str) -> String {
+/// The existence half of readiness, callable from either session kind.
+/// Semantic mounts carry no layout, so the non-zero-bounds assertion lives
+/// on the rendered variant below.
+pub fn assert_chart_semantic_ready<R: RuntimeDriver>(
+    app: &mut SemanticApp<R>,
+    name: &str,
+) -> String {
     let selector = image_selector(name);
     assert!(
         app.wait_for_existence(&selector, Duration::from_secs(1)),
         "{name}: accessibility image element did not appear"
     );
     app.assert_exists(&selector);
-    let element = app
+    chart_label(name)
+}
+
+pub fn assert_chart_accessibility_ready(app: &mut OffscreenApp, name: &str) -> String {
+    let label = assert_chart_semantic_ready(app.semantic_mut(), name);
+    let bounds = app
         .query()
         .role(Role::IMAGE)
-        .label(chart_label(name))
-        .single();
-    let bounds = element.bounds();
+        .label(label.clone())
+        .single()
+        .bounds();
     assert!(
         bounds.width() > 0.0 && bounds.height() > 0.0,
         "{name}: chart accessibility bounds must be non-zero"
     );
-    chart_label(name)
+    label
 }
 
-pub fn assert_label_exists(app: &mut SemanticApp, label: &str) {
+pub fn assert_label_exists(app: &mut OffscreenApp, label: &str) {
     let selector = Selector::default()
         .role(Role::LABEL)
         .label(label.to_owned());

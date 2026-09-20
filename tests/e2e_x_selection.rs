@@ -8,7 +8,7 @@ use waterui::component::{text, vstack};
 use waterui::graphics::color::Srgb;
 use waterui::{Binding, SignalExt as _, View, ViewExt as _};
 use waterui_chart::{DepthChart, DepthSide, LineChart};
-use waterui_testing::{Role, UiBuilder};
+use waterui_testing::{Role, Styled, UiBuilder};
 
 use support::{
     assert_chart_accessibility_ready, chart_surface, depth_data, depth_hit_location,
@@ -103,8 +103,10 @@ fn y_range_readout(selection: Binding<Option<RangeInclusive<f32>>>) -> impl View
     .padding_with(6.0)
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_x_selection_updates_continuous_domain_value_on_tap(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_x_selection_updates_continuous_domain_value_on_tap(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let selection = Binding::container(None::<f32>);
     let data_for_view = data.clone();
@@ -114,7 +116,7 @@ fn line_chart_x_selection_updates_continuous_domain_value_on_tap(ui: UiBuilder) 
     let expected_label = format!("x:{expected_x:.2}");
     let location = point_hit_location(&data, index);
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
             .chart_x_selection(&selection_for_view);
         selection_shell(
@@ -149,8 +151,8 @@ fn line_chart_x_selection_updates_continuous_domain_value_on_tap(ui: UiBuilder) 
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_x_selection_range_tracks_drag_span(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_x_selection_range_tracks_drag_span(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
     let data = point_series();
     let selection = Binding::container(None::<RangeInclusive<f32>>);
     let data_for_view = data.clone();
@@ -163,7 +165,7 @@ fn line_chart_x_selection_range_tracks_drag_span(ui: UiBuilder) {
     let from = point_hit_location(&data, from_index);
     let to = point_hit_location(&data, to_index);
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
             .chart_x_selection_range(&selection_for_view);
         selection_shell(
@@ -199,8 +201,10 @@ fn line_chart_x_selection_range_tracks_drag_span(ui: UiBuilder) {
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_y_selection_updates_continuous_domain_value_on_tap(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_y_selection_updates_continuous_domain_value_on_tap(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let selection = Binding::container(None::<f32>);
     let data_for_view = data.clone();
@@ -210,7 +214,7 @@ fn line_chart_y_selection_updates_continuous_domain_value_on_tap(ui: UiBuilder) 
     let expected_label = format!("y:{expected_y:.2}");
     let location = point_hit_location(&data, index);
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
             .chart_y_selection(&selection_for_view);
         selection_shell(
@@ -245,8 +249,8 @@ fn line_chart_y_selection_updates_continuous_domain_value_on_tap(ui: UiBuilder) 
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_y_selection_range_tracks_drag_span(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_y_selection_range_tracks_drag_span(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
     let data = point_series();
     let selection = Binding::container(None::<RangeInclusive<f32>>);
     let data_for_view = data.clone();
@@ -259,7 +263,7 @@ fn line_chart_y_selection_range_tracks_drag_span(ui: UiBuilder) {
     let from = point_hit_location(&data, from_index);
     let to = point_hit_location(&data, to_index);
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
             .chart_y_selection_range(&selection_for_view);
         selection_shell(
@@ -295,8 +299,10 @@ fn line_chart_y_selection_range_tracks_drag_span(ui: UiBuilder) {
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_updates_x_and_y_selection_together_on_tap(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_updates_x_and_y_selection_together_on_tap(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let x_selection = Binding::container(None::<f32>);
     let y_selection = Binding::container(None::<f32>);
@@ -308,7 +314,7 @@ fn line_chart_updates_x_and_y_selection_together_on_tap(ui: UiBuilder) {
     let expected_y = data[index].y;
     let location = point_hit_location(&data, index);
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
             .chart_x_selection(&x_for_view)
             .chart_y_selection(&y_for_view);
@@ -364,8 +370,10 @@ fn line_chart_updates_x_and_y_selection_together_on_tap(ui: UiBuilder) {
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn depth_chart_x_selection_tracks_price_domain_on_tap(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn depth_chart_x_selection_tracks_price_domain_on_tap(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = depth_data();
     let selection = Binding::container(None::<f32>);
     let data_for_view = data.clone();
@@ -376,7 +384,7 @@ fn depth_chart_x_selection_tracks_price_domain_on_tap(ui: UiBuilder) {
     let expected_label = format!("x:{expected_x:.2}");
     let location = depth_hit_location(&data, side, index);
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = DepthChart::new(Binding::container(data_for_view.clone()))
             .chart_x_selection(&selection_for_view);
         selection_shell(

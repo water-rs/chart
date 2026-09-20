@@ -8,11 +8,11 @@ use waterui::graphics::color::Srgb;
 use waterui::layout::{PositionExt, UnitPoint, absolute};
 use waterui::{Binding, SignalExt as _, View, ViewExt as _};
 use waterui_chart::LineChart;
-use waterui_testing::{Role, SemanticApp, UiBuilder};
+use waterui_testing::{OffscreenApp, Role, Styled, UiBuilder};
 
 use support::{
-    CHART_HEIGHT, CHART_WIDTH, assert_chart_accessibility_ready, assert_label_exists,
-    chart_surface, point_hit_location, point_series,
+    CHART_HEIGHT, CHART_WIDTH, assert_chart_accessibility_ready, assert_chart_semantic_ready,
+    assert_label_exists, chart_surface, point_hit_location, point_series,
 };
 
 fn overlay_badge(label: &'static str) -> impl View {
@@ -25,7 +25,7 @@ fn overlay_badge(label: &'static str) -> impl View {
         .a11y_label(label)
 }
 
-fn assert_label_bounds(app: &mut SemanticApp, label: &str) {
+fn assert_label_bounds(app: &mut OffscreenApp, label: &str) {
     let badge = app.query().role(Role::LABEL).label(label).single();
     let bounds = badge.bounds();
     assert!(
@@ -77,12 +77,11 @@ fn chart_background_uses_plot_area_proxy_in_accessibility_tree(ui: UiBuilder) {
         )
         .background(Srgb::BLACK)
     });
-    assert_chart_accessibility_ready(&mut app, "composition-background");
+    assert_chart_semantic_ready(&mut app, "composition-background");
     app.query()
         .role(Role::LABEL)
         .label("Plot area marker")
         .assert_exists();
-    assert_label_bounds(&mut app, "Plot area marker");
 }
 
 #[waterui::test(viewport = (320, 320))]
@@ -101,16 +100,17 @@ fn chart_overlay_static_layer_exposes_accessibility_node(ui: UiBuilder) {
         )
         .background(Srgb::BLACK)
     });
-    assert_chart_accessibility_ready(&mut app, "composition-overlay");
+    assert_chart_semantic_ready(&mut app, "composition-overlay");
     app.query()
         .role(Role::LABEL)
         .label("Static overlay")
         .assert_exists();
-    assert_label_bounds(&mut app, "Static overlay");
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let index = 10;
     let location = point_hit_location(&data, index);
@@ -118,7 +118,7 @@ fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(ui: UiBuild
         Binding::container(None::<waterui_chart::HitResult<waterui_chart::DataPoint>>);
     let proxy_selected_for_view = proxy_selected.clone();
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let proxy_selected_binding = proxy_selected_for_view.clone();
         chart_surface(
             "composition-line",
@@ -157,15 +157,17 @@ fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(ui: UiBuild
     assert_label_bounds(&mut app, "Proxy selection overlay");
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn chart_overlay_reacts_to_proxy_selection_with_external_binding(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn chart_overlay_reacts_to_proxy_selection_with_external_binding(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let index = 10;
     let location = point_hit_location(&data, index);
     let selected = Binding::container(None::<waterui_chart::HitResult<waterui_chart::DataPoint>>);
     let selected_for_view = selected.clone();
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         chart_surface(
             "composition-line-external",
             LineChart::new(Binding::container(data.clone()))
@@ -215,22 +217,22 @@ fn chart_overlay_reactive_layer_is_initially_hidden_without_selection(ui: UiBuil
         )
         .background(Srgb::BLACK)
     });
-    assert_chart_accessibility_ready(&mut app, "composition-hidden");
+    assert_chart_semantic_ready(&mut app, "composition-hidden");
     app.query()
         .role(Role::LABEL)
         .label("Hidden overlay")
         .assert_not_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
     let data = point_series();
     let index = 10;
     let location = point_hit_location(&data, index);
     let selected = Binding::container(None::<waterui_chart::HitResult<waterui_chart::DataPoint>>);
     let selected_for_view = selected.clone();
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         chart_surface(
             "composition-line-tooltip",
             LineChart::new(Binding::container(data.clone()))
@@ -278,15 +280,15 @@ fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder) {
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn selected_tooltip_exposes_accessibility_labels(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn selected_tooltip_exposes_accessibility_labels(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
     let data = point_series();
     let index = 10;
     let location = point_hit_location(&data, index);
     let selected = Binding::container(None::<waterui_chart::HitResult<waterui_chart::DataPoint>>);
     let selected_for_view = selected.clone();
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         chart_surface(
             "composition-line-selected-tooltip",
             LineChart::new(Binding::container(data.clone()))
