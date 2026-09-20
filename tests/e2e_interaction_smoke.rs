@@ -4,7 +4,7 @@ mod support;
 
 use waterui::Binding;
 use waterui_chart::{HitResult, LineChart, PieChart};
-use waterui_testing::UiBuilder;
+use waterui_testing::{Styled, UiBuilder};
 
 use support::{
     assert_chart_accessibility_ready, assert_label_exists, chart_label, pie_data, pie_hit_location,
@@ -17,8 +17,10 @@ fn chart_labels_are_stable() {
     assert_eq!(chart_label("pie"), "chart-pie");
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_drag_between_updates_selection_smoke(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_drag_between_updates_selection_smoke(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let focused = Binding::container(None::<HitResult<waterui_chart::DataPoint>>);
     let selected = Binding::container(None::<HitResult<waterui_chart::DataPoint>>);
@@ -30,7 +32,7 @@ fn line_chart_drag_between_updates_selection_smoke(ui: UiBuilder) {
     let from = point_hit_location(&data, from_index);
     let to = point_hit_location(&data, to_index);
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
             .focused(&focused_for_view)
             .selected(&selected_for_view);
@@ -78,8 +80,8 @@ fn line_chart_drag_between_updates_selection_smoke(ui: UiBuilder) {
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn pie_chart_hover_and_tap_coordinate_smoke(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn pie_chart_hover_and_tap_coordinate_smoke(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
     let data = pie_data();
     let focused = Binding::container(None::<HitResult<waterui_chart::SliceDatum>>);
     let selected = Binding::container(None::<HitResult<waterui_chart::SliceDatum>>);
@@ -90,7 +92,7 @@ fn pie_chart_hover_and_tap_coordinate_smoke(ui: UiBuilder) {
     let location = pie_hit_location(&data, index, 0.0);
     let expected = pie_slice_datum(&data, index);
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = PieChart::new(Binding::container(data_for_view.clone()))
             .focused(&focused_for_view)
             .selected(&selected_for_view);

@@ -6,11 +6,11 @@ use waterui::component::{text, vstack};
 use waterui::graphics::color::Srgb;
 use waterui::{Binding, SignalExt as _, View, ViewExt as _};
 use waterui_chart::{ChartScrollableAxes, DataBounds, LineChart};
-use waterui_testing::{Role, Selector, UiBuilder, WaitOptions, WaitResult};
+use waterui_testing::{Role, Selector, Styled, UiBuilder, WaitOptions, WaitResult};
 
 use support::{
-    assert_chart_accessibility_ready, chart_surface, horizontal_drag_domain_delta, point_series,
-    vertical_drag_domain_delta,
+    assert_chart_accessibility_ready, assert_chart_semantic_ready, chart_surface,
+    horizontal_drag_domain_delta, point_series, vertical_drag_domain_delta,
 };
 
 fn assert_close(actual: f32, expected: f32, epsilon: f32, context: &str) {
@@ -43,8 +43,10 @@ fn scalar_readout(prefix: &'static str, binding: Binding<f32>) -> impl View {
     .padding_with(6.0)
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_horizontal_drag_updates_scroll_position_binding(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_horizontal_drag_updates_scroll_position_binding(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let bounds = DataBounds::from_points(&data).with_padding(0.1);
     let visible_length = 8.0_f32;
@@ -57,7 +59,7 @@ fn line_chart_horizontal_drag_updates_scroll_position_binding(ui: UiBuilder) {
     let data_for_view = data;
     let scroll_for_view = scroll_position.clone();
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
             .chart_x_visible_domain(visible_length)
             .chart_x_scroll_position(&scroll_for_view)
@@ -83,8 +85,10 @@ fn line_chart_horizontal_drag_updates_scroll_position_binding(ui: UiBuilder) {
         .assert_exists();
 }
 
-#[waterui::test(viewport = (320, 320))]
-fn line_chart_vertical_drag_updates_scroll_position_binding(ui: UiBuilder) {
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+fn line_chart_vertical_drag_updates_scroll_position_binding(
+    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
+) {
     let data = point_series();
     let bounds = DataBounds::from_points(&data).with_padding(0.1);
     let visible_length = 10.0_f32;
@@ -96,7 +100,7 @@ fn line_chart_vertical_drag_updates_scroll_position_binding(ui: UiBuilder) {
     let data_for_view = data;
     let scroll_for_view = scroll_position.clone();
 
-    let mut app = ui.mount(move || {
+    let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
             .chart_y_visible_domain(visible_length)
             .chart_y_scroll_position(&scroll_for_view)
@@ -159,7 +163,7 @@ fn line_chart_reactive_visible_domain_length_triggers_redraw(ui: UiBuilder) {
         )
     });
 
-    assert_chart_accessibility_ready(&mut app, "line-visible-domain-reactive");
+    assert_chart_semantic_ready(&mut app, "line-visible-domain-reactive");
     visible_length.set(4.0);
     assert!(
         app.wait_for(
