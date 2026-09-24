@@ -72,13 +72,23 @@ fn line_chart_horizontal_drag_updates_scroll_position_binding(
     });
 
     let chart_label = assert_chart_accessibility_ready(&mut app, "line-scroll-x");
-    assert_close(scroll_position.snapshot(), start, 0.05, "line-scroll-x initial");
+    assert_close(
+        scroll_position.snapshot(),
+        start,
+        0.05,
+        "line-scroll-x initial",
+    );
 
     app.query()
         .role(Role::IMAGE)
         .label(chart_label)
         .drag_between(from.0, from.1, to.0, to.1);
-    assert_close(scroll_position.snapshot(), expected, 0.08, "line-scroll-x drag");
+    assert_close(
+        scroll_position.snapshot(),
+        expected,
+        0.08,
+        "line-scroll-x drag",
+    );
     app.query()
         .role(Role::LABEL)
         .label(format!("x-pos:{expected:.2}"))
@@ -124,7 +134,12 @@ fn line_chart_vertical_drag_updates_scroll_position_binding(
         .role(Role::IMAGE)
         .label(chart_label)
         .drag_between(from.0, from.1, to.0, to.1);
-    assert_close(scroll_position.snapshot(), expected, 0.08, "line-scroll-y drag");
+    assert_close(
+        scroll_position.snapshot(),
+        expected,
+        0.08,
+        "line-scroll-y drag",
+    );
     app.query()
         .role(Role::LABEL)
         .label(format!("y-pos:{expected:.2}"))
