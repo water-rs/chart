@@ -4,7 +4,7 @@ mod support;
 
 use waterui::component::{text, vstack};
 use waterui::graphics::color::Srgb;
-use waterui::{Binding, SignalExt as _, View, ViewExt as _};
+use waterui::{Binding, Signal as _, SignalExt as _, View, ViewExt as _};
 use waterui_chart::{ChartScrollableAxes, DataBounds, LineChart};
 use waterui_testing::{Role, Selector, Styled, UiBuilder, WaitOptions, WaitResult};
 

@@ -5,7 +5,7 @@ mod support;
 use std::collections::BTreeSet;
 use std::time::Duration;
 
-use waterui::{Binding, View};
+use waterui::{Binding, Signal as _, View};
 use waterui_chart::{
     AreaChart, AreaDatum, AxisConfig, BarChart, BubbleChart, BubblePoint, Candle, CandlestickChart,
     ChartExt, DataBounds, DataPoint, DepthChart, DepthDatum, DepthSide, HitResult, LineChart,

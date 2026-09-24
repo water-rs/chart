@@ -6,7 +6,7 @@ use core::ops::RangeInclusive;
 
 use waterui::component::{text, vstack};
 use waterui::graphics::color::Srgb;
-use waterui::{Binding, SignalExt as _, View, ViewExt as _};
+use waterui::{Binding, Signal as _, SignalExt as _, View, ViewExt as _};
 use waterui_chart::{DepthChart, DepthSide, LineChart};
 use waterui_testing::{Role, Styled, UiBuilder};
 

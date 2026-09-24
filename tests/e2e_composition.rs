@@ -6,7 +6,7 @@ use waterui::accessibility::{AccessibilityRole, AccessibilityState};
 use waterui::component::text;
 use waterui::graphics::color::Srgb;
 use waterui::layout::{PositionExt, UnitPoint, absolute};
-use waterui::{Binding, SignalExt as _, View, ViewExt as _};
+use waterui::{Binding, Signal as _, SignalExt as _, View, ViewExt as _};
 use waterui_chart::LineChart;
 use waterui_testing::{OffscreenApp, Role, Styled, UiBuilder};
 

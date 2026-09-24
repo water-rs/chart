@@ -2,7 +2,7 @@
 
 mod support;
 
-use waterui::Binding;
+use waterui::{Binding, Signal as _};
 use waterui_chart::{HitResult, LineChart, PieChart};
 use waterui_testing::{Styled, UiBuilder};
 
