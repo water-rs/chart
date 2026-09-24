@@ -85,7 +85,7 @@ fn assert_chart_semantic_flow<T, V, F>(
         .label(chart_label.clone())
         .hover_at(hover_at.0, hover_at.1);
     let focused_hit = focused
-        .get()
+        .snapshot()
         .expect("focused binding should hold a hit result after hover");
     assert_eq!(
         focused_hit.series, expected.series,
@@ -112,7 +112,7 @@ fn assert_chart_semantic_flow<T, V, F>(
         .label(chart_label)
         .tap_at(hover_at.0, hover_at.1);
     let selected_hit = selected
-        .get()
+        .snapshot()
         .expect("selected binding should hold a hit result after tap");
     assert_eq!(
         selected_hit.series, expected.series,

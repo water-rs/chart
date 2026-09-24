@@ -138,7 +138,7 @@ fn line_chart_x_selection_updates_continuous_domain_value_on_tap(
         .tap_at(location.0, location.1);
 
     let actual_x = selection
-        .get()
+        .snapshot()
         .expect("line-x-value: tap should populate x selection");
     assert_close(actual_x, expected_x, 0.05, "line-x-value");
     app.query()
@@ -187,7 +187,7 @@ fn line_chart_x_selection_range_tracks_drag_span(ui: UiBuilder<Styled<hydrolysis
         .drag_between(from.0, from.1, to.0, to.1);
 
     let actual = selection
-        .get()
+        .snapshot()
         .expect("line-x-range: drag should populate x selection range");
     assert_close(*actual.start(), expected_start, 0.05, "line-x-range start");
     assert_close(*actual.end(), expected_end, 0.05, "line-x-range end");
@@ -236,7 +236,7 @@ fn line_chart_y_selection_updates_continuous_domain_value_on_tap(
         .tap_at(location.0, location.1);
 
     let actual_y = selection
-        .get()
+        .snapshot()
         .expect("line-y-value: tap should populate y selection");
     assert_close(actual_y, expected_y, 0.05, "line-y-value");
     app.query()
@@ -285,7 +285,7 @@ fn line_chart_y_selection_range_tracks_drag_span(ui: UiBuilder<Styled<hydrolysis
         .drag_between(from.0, from.1, to.0, to.1);
 
     let actual = selection
-        .get()
+        .snapshot()
         .expect("line-y-range: drag should populate y selection range");
     assert_close(*actual.start(), expected_start, 0.05, "line-y-range start");
     assert_close(*actual.end(), expected_end, 0.05, "line-y-range end");
@@ -346,7 +346,7 @@ fn line_chart_updates_x_and_y_selection_together_on_tap(
 
     assert_close(
         x_selection
-            .get()
+            .snapshot()
             .expect("line-xy-value: tap should populate x selection"),
         expected_x,
         0.05,
@@ -354,7 +354,7 @@ fn line_chart_updates_x_and_y_selection_together_on_tap(
     );
     assert_close(
         y_selection
-            .get()
+            .snapshot()
             .expect("line-xy-value: tap should populate y selection"),
         expected_y,
         0.05,
@@ -406,7 +406,7 @@ fn depth_chart_x_selection_tracks_price_domain_on_tap(
         .tap_at(location.0, location.1);
 
     let actual_x = selection
-        .get()
+        .snapshot()
         .expect("depth-x-value: tap should populate x selection");
     assert_close(actual_x, expected_x, 0.05, "depth-x-value");
     app.query()

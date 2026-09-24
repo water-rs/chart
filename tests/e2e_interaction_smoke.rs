@@ -64,9 +64,9 @@ fn line_chart_drag_between_updates_selection_smoke(
         .role(waterui_testing::Role::IMAGE)
         .label(label)
         .drag_between(from.0, from.1, to.0, to.1);
-    assert!(focused.get().is_none(), "line: drag end should clear focus");
+    assert!(focused.snapshot().is_none(), "line: drag end should clear focus");
     let selected_hit = selected
-        .get()
+        .snapshot()
         .expect("line: drag end should produce a selected hit");
     assert_eq!(selected_hit.series, 0);
     assert!(selected_hit.index >= from_index && selected_hit.index <= to_index);
@@ -125,7 +125,7 @@ fn pie_chart_hover_and_tap_coordinate_smoke(ui: UiBuilder<Styled<hydrolysis_m3::
         .label(label.clone())
         .hover_at(location.0, location.1);
     let focused_hit = focused
-        .get()
+        .snapshot()
         .expect("pie: hover should produce a focused hit");
     assert_eq!(focused_hit.series, 0);
     assert_eq!(focused_hit.index, index);
@@ -137,7 +137,7 @@ fn pie_chart_hover_and_tap_coordinate_smoke(ui: UiBuilder<Styled<hydrolysis_m3::
         .label(label)
         .tap_at(location.0, location.1);
     let selected_hit = selected
-        .get()
+        .snapshot()
         .expect("pie: tap should produce a selected hit");
     assert_eq!(selected_hit.series, 0);
     assert_eq!(selected_hit.index, index);
