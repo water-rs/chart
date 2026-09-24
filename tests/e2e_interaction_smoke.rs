@@ -64,7 +64,10 @@ fn line_chart_drag_between_updates_selection_smoke(
         .role(waterui_testing::Role::IMAGE)
         .label(label)
         .drag_between(from.0, from.1, to.0, to.1);
-    assert!(focused.snapshot().is_none(), "line: drag end should clear focus");
+    assert!(
+        focused.snapshot().is_none(),
+        "line: drag end should clear focus"
+    );
     let selected_hit = selected
         .snapshot()
         .expect("line: drag end should produce a selected hit");
