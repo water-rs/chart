@@ -147,7 +147,7 @@ fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(
         .label(chart_label)
         .tap_at(location.0, location.1);
     assert!(
-        proxy_selected.get().is_some(),
+        proxy_selected.snapshot().is_some(),
         "chart_overlay proxy selection should update without external chart bindings"
     );
     app.query()
@@ -192,7 +192,7 @@ fn chart_overlay_reacts_to_proxy_selection_with_external_binding(
         .label(chart_label)
         .tap_at(location.0, location.1);
     assert!(
-        selected.get().is_some(),
+        selected.snapshot().is_some(),
         "external selected binding should update"
     );
     app.query()
@@ -271,7 +271,7 @@ fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder<Styled<hydrolysis
         .label(chart_label)
         .tap_at(location.0, location.1);
     assert!(
-        selected.get().is_some(),
+        selected.snapshot().is_some(),
         "composition-line-tooltip: tap should update the selected binding"
     );
     app.query()
@@ -317,7 +317,7 @@ fn selected_tooltip_exposes_accessibility_labels(ui: UiBuilder<Styled<hydrolysis
         .label(chart_label)
         .tap_at(location.0, location.1);
     assert!(
-        selected.get().is_some(),
+        selected.snapshot().is_some(),
         "composition-line-selected-tooltip: tap should update selected binding"
     );
     assert_label_exists(&mut app, "Selected");
