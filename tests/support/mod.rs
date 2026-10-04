@@ -16,7 +16,7 @@ use waterui_chart::{
 use waterui_testing::{OffscreenApp, Role, RuntimeDriver, Selector, SemanticApp};
 
 pub const VIEWPORT_WIDTH: u32 = 320;
-pub const VIEWPORT_HEIGHT: u32 = 320;
+pub const VIEWPORT_HEIGHT: u32 = 360;
 pub const CHART_WIDTH: f32 = 240.0;
 pub const CHART_HEIGHT: f32 = 180.0;
 pub const SNAPSHOT_SUITE: &str = "semantic-selection";
