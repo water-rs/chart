@@ -50,6 +50,13 @@ jobs:
         shell: pwsh
         run: Add-Content -Path $env:GITHUB_PATH -Value "${{ steps.msys2.outputs.msys2-location }}\ucrt64\bin"
       - uses: Swatinem/rust-cache@v2
+      - uses: astral-sh/setup-uv@v6
+      # Hydrolysis's styled tests resolve their font families through
+      # system font discovery; the fonts are built from pinned,
+      # hash-verified sources by the install script of the pinned waterui.
+      - name: Install Hydrolysis test fonts
+        shell: bash
+        run: uv run "$(cargo metadata --format-version 1 --locked | jq -er '.packages[] | select(.name == "hydrolysis") | .manifest_path | sub("Cargo.toml$"; "test-fonts/install.py")')"
       # The example's `dev` feature turns on the framework's dynamic linking,
       # which links the whole framework into one dylib; on Windows that trips
       # MSVC's 65535-object library limit (LNK1189). The example builds with its
