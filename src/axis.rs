@@ -191,7 +191,7 @@ impl core::fmt::Debug for TickFormat {
 }
 
 /// A computed tick mark.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Tick {
     value: f32,
     label: Str,
@@ -320,7 +320,7 @@ mod tests {
         let ticks = config.compute_ticks(0.0, 100.0);
 
         // Should have nice round numbers
-        assert!(!ticks.is_empty());
+        assert_ne!(ticks, Vec::new());
         assert!(ticks.iter().all(|t| {
             let by_twenty = (t.value() % 20.0).abs() <= f32::EPSILON;
             let by_twenty_five = (t.value() % 25.0).abs() <= f32::EPSILON;
@@ -339,6 +339,6 @@ mod tests {
     fn test_empty_range() {
         let config = AxisConfig::new();
         let ticks = config.compute_ticks(50.0, 50.0);
-        assert!(ticks.is_empty());
+        assert_eq!(ticks, Vec::new());
     }
 }
