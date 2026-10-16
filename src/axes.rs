@@ -244,7 +244,7 @@ fn grid_color() -> Color {
     Color::srgb_f32(0.5, 0.5, 0.5).with_opacity(0.3)
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 struct ReactiveTick(Tick);
 
 impl Identifiable for ReactiveTick {
