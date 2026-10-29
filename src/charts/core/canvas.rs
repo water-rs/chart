@@ -591,7 +591,7 @@ where
                 let tap = env
                     .get::<TapEvent>()
                     .expect("interactive_cartesian_signal_canvas: TapEvent missing from gesture environment");
-                let point = gesture_point_to_point(tap.location);
+                let point = gesture_point_to_point(tap.location());
                 let Some(geometry) = geometry.snapshot() else {
                     return;
                 };
@@ -637,16 +637,16 @@ where
                 let Some(geometry) = geometry.snapshot() else {
                     return;
                 };
-                let point = gesture_point_to_point(drag_event.location);
+                let point = gesture_point_to_point(drag_event.location());
 
                 if handles_selection_drag {
-                    match drag_event.phase {
+                    match drag_event.phase() {
                         GesturePhase::Started => {
                             let hit = geometry.hit_test(point);
                             selection.set_focus(hit);
                             let start_point = Point::new(
-                                point.x - drag_event.translation.x,
-                                point.y - drag_event.translation.y,
+                                point.x - drag_event.translation().x,
+                                point.y - drag_event.translation().y,
                             );
                             if cartesian_selection.tracks_x_range() {
                                 if let Some(start) =
@@ -755,7 +755,7 @@ where
 
                 let base_bounds = base_bounds.snapshot();
                 let plot_viewport = geometry.viewport;
-                match drag_event.phase {
+                match drag_event.phase() {
                     GesturePhase::Started => {
                         selection.clear_focus();
                         if cartesian_viewport.allows_horizontal_drag() {
@@ -771,7 +771,7 @@ where
                                 let visible_width = geometry.bounds.width();
                                 let max_start =
                                     (base_bounds.max_x - visible_width).max(base_bounds.min_x);
-                                let candidate = (drag_event.translation.x / plot_viewport.width)
+                                let candidate = (drag_event.translation().x / plot_viewport.width)
                                     .mul_add(-visible_width, start);
                                 let clamped = if max_start <= base_bounds.min_x {
                                     base_bounds.min_x
@@ -780,7 +780,7 @@ where
                                 };
                                 cartesian_viewport.set_x_position(clamped);
                             }
-                            if matches!(drag_event.phase, GesturePhase::Ended) {
+                            if matches!(drag_event.phase(), GesturePhase::Ended) {
                                 x_range_start.set(None);
                             }
                         }
@@ -789,7 +789,7 @@ where
                                 let visible_height = geometry.bounds.height();
                                 let max_start =
                                     (base_bounds.max_y - visible_height).max(base_bounds.min_y);
-                                let candidate = (drag_event.translation.y / plot_viewport.height)
+                                let candidate = (drag_event.translation().y / plot_viewport.height)
                                     .mul_add(-visible_height, start);
                                 let clamped = if max_start <= base_bounds.min_y {
                                     base_bounds.min_y
@@ -798,7 +798,7 @@ where
                                 };
                                 cartesian_viewport.set_y_position(clamped);
                             }
-                            if matches!(drag_event.phase, GesturePhase::Ended) {
+                            if matches!(drag_event.phase(), GesturePhase::Ended) {
                                 y_range_start.set(None);
                             }
                         }
@@ -825,7 +825,7 @@ where
                 );
                 let hit = geometry
                     .snapshot()
-                    .and_then(|geometry| geometry.hit_test(hover.location));
+                    .and_then(|geometry| geometry.hit_test(hover.location()));
                 selection.set_focus(hit);
             }
         }),
@@ -942,7 +942,7 @@ where
                     .expect("interactive_signal_canvas: TapEvent missing from gesture environment");
                 let hit = geometry
                     .snapshot()
-                    .and_then(|geometry| geometry.hit_test(gesture_point_to_point(tap.location)));
+                    .and_then(|geometry| geometry.hit_test(gesture_point_to_point(tap.location())));
                 selection.set_focus(hit.clone());
                 selection.set_selected(hit);
             }
@@ -960,16 +960,16 @@ where
                 let drag_event = env.get::<DragEvent>().expect(
                     "interactive_signal_canvas: DragEvent missing from gesture environment",
                 );
-                match drag_event.phase {
+                match drag_event.phase() {
                     GesturePhase::Started | GesturePhase::Updated => {
                         let hit = geometry.snapshot().and_then(|geometry| {
-                            geometry.hit_test(gesture_point_to_point(drag_event.location))
+                            geometry.hit_test(gesture_point_to_point(drag_event.location()))
                         });
                         selection.set_focus(hit);
                     }
                     GesturePhase::Ended => {
                         let hit = geometry.snapshot().and_then(|geometry| {
-                            geometry.hit_test(gesture_point_to_point(drag_event.location))
+                            geometry.hit_test(gesture_point_to_point(drag_event.location()))
                         });
                         selection.set_selected(hit);
                         selection.clear_focus();
@@ -993,7 +993,7 @@ where
                     .expect("interactive_signal_canvas: HoverEvent missing from event environment");
                 let hit = geometry
                     .snapshot()
-                    .and_then(|geometry| geometry.hit_test(hover.location));
+                    .and_then(|geometry| geometry.hit_test(hover.location()));
                 selection.set_focus(hit);
             }
         }),
