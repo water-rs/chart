@@ -536,7 +536,7 @@ mod tests {
         pie.save_png("/tmp/waterui_chart_pie.png")
             .expect("save pie snapshot");
         assert!(
-            pie.rgba8 != bar.rgba8,
+            pie.rgba8() != bar.rgba8(),
             "Bug 1: tapping Pie must switch the rendered chart (a node-owned SceneView \
              must render the new scene, not replay the stale Bar capture)"
         );
@@ -548,7 +548,7 @@ mod tests {
             .save_png("/tmp/waterui_chart_gauge.png")
             .expect("save gauge snapshot");
         assert!(
-            gauge.rgba8 != pie.rgba8,
+            gauge.rgba8() != pie.rgba8(),
             "Bug 1/2: switching to Gauge must render the new chart and reflow the layout"
         );
     }
