@@ -19,8 +19,8 @@ use waterui_graphics::color::Color;
 use waterui_layout::container::{FixedContainer, LazyContainer};
 use waterui_layout::padding::{EdgeInsets, Padding};
 use waterui_layout::{
-    AbsoluteLayout, Layout, Point, PositionExt, ProposalSize, Rect, Size, StretchAxis, SubView,
-    SubviewPlacement, UnitPoint, absolute,
+    AbsoluteLayout, Layout, LayoutError, PlacementInput, Point, PositionExt, ProposalSize, Rect,
+    Size, StretchAxis, SubView, SubviewPlacement, UnitPoint, absolute,
 };
 use waterui_text::{Text, text};
 
@@ -295,6 +295,16 @@ impl Layout for ReactiveAxisLayout {
         )
     }
 
+    /// An axis item is a canvas over the chart: its answer at the bounds'
+    /// origin, wherever it draws its tick or label.
+    fn resolve_extent(
+        &self,
+        input: PlacementInput,
+        _children: &[&dyn SubView],
+    ) -> Result<Rect, LayoutError> {
+        Ok(input.bounds.align(input.extent()?, UnitPoint::TOP_LEADING))
+    }
+
     fn place(
         &self,
         bounds: Rect,
@@ -486,7 +496,7 @@ impl<V: View + Sized> ChartExt for V {}
 #[cfg(test)]
 mod tests {
     use super::*;
-    use waterui_core::layout::ViewDimensions;
+    use waterui_core::layout::{ResolvedExtent, ViewDimensions};
 
     struct Label;
 
@@ -494,6 +504,14 @@ mod tests {
         fn measure(&self, proposal: ProposalSize) -> ViewDimensions {
             assert_eq!(proposal, ProposalSize::UNSPECIFIED);
             ViewDimensions::new(Size::new(24.0, 12.0))
+        }
+
+        fn resolve_extent(
+            &self,
+            bounds: Rect,
+            proposal: ProposalSize,
+        ) -> Result<ResolvedExtent, LayoutError> {
+            ResolvedExtent::centred(bounds, self.measure(proposal).size)
         }
 
         fn stretch_axis(&self) -> StretchAxis {
