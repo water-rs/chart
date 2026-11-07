@@ -638,14 +638,13 @@ dependencies = [
 [[package]]
 name = "cherenkov"
 version = "0.0.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "arc-swap",
  "cherenkov-record",
  "crossbeam-channel",
  "filtrate-core",
  "kurbo",
- "libc",
  "libm",
  "parley 0.12.0",
  "rustc-hash 2.1.3",
@@ -659,7 +658,7 @@ dependencies = [
 [[package]]
 name = "cherenkov-gpu"
 version = "0.0.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "ash",
  "block2",
@@ -710,7 +709,7 @@ dependencies = [
 [[package]]
 name = "cherenkov-record"
 version = "0.0.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "color",
  "filtrate-core",
@@ -725,7 +724,7 @@ dependencies = [
 [[package]]
 name = "cherenkov-shader"
 version = "0.0.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "naga",
  "thiserror 2.0.21",
@@ -734,7 +733,7 @@ dependencies = [
 [[package]]
 name = "cherenkov-simd"
 version = "0.0.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "fearless_simd",
 ]
@@ -742,7 +741,7 @@ dependencies = [
 [[package]]
 name = "cherenkov-stroke"
 version = "0.0.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "kurbo",
  "num-bigint",
@@ -1271,7 +1270,7 @@ dependencies = [
 [[package]]
 name = "filtrate"
 version = "0.2.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "blocking",
  "bytemuck",
@@ -1293,7 +1292,7 @@ dependencies = [
 [[package]]
 name = "filtrate-core"
 version = "0.2.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "askama",
  "libm",
@@ -1302,7 +1301,7 @@ dependencies = [
 [[package]]
 name = "filtrate-derive"
 version = "0.1.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -1712,7 +1711,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 [[package]]
 name = "hydrolysis"
 version = "0.3.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "accesskit",
  "android_logger",
@@ -1771,7 +1770,7 @@ dependencies = [
 [[package]]
 name = "hydrolysis-m3"
 version = "0.3.1"
-source = "git+https://github.com/water-rs/hydrolysis-m3?branch=dev#e4f35d8232f66f9a8595eeedef69f5c4c49835f1"
+source = "git+https://github.com/water-rs/hydrolysis-m3?branch=feat%2Fresponse-geometry#0979faf05ffa037c158e058f9aea75fdaa39323d"
 dependencies = [
  "hydrolysis",
  "material-color-utils",
@@ -1795,7 +1794,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.56.0",
+ "windows-core 0.62.2",
 ]
 
 [[package]]
@@ -3423,7 +3422,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d8fae84b431384b68627d0f9b3b1245fcf9f46f6c0e3dc902e9dce64edd1967"
 dependencies = [
  "libc",
- "windows-sys 0.45.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5146,7 +5145,7 @@ dependencies = [
 [[package]]
 name = "waterui"
 version = "0.5.2"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "waterui-dylib",
  "waterui-internal",
@@ -5155,7 +5154,7 @@ dependencies = [
 [[package]]
 name = "waterui-apple-os"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "objc2",
 ]
@@ -5163,7 +5162,7 @@ dependencies = [
 [[package]]
 name = "waterui-assets"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "blocking",
  "memmap2",
@@ -5176,7 +5175,7 @@ dependencies = [
 [[package]]
 name = "waterui-assets-core"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "blocking",
  "tempfile",
@@ -5186,7 +5185,7 @@ dependencies = [
 [[package]]
 name = "waterui-assets-macros"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -5199,7 +5198,7 @@ dependencies = [
 [[package]]
 name = "waterui-assets-planner"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "cargo_metadata",
  "heck",
@@ -5215,7 +5214,7 @@ dependencies = [
 [[package]]
 name = "waterui-backend-core"
 version = "0.5.2"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "kurbo",
  "nami",
@@ -5262,7 +5261,7 @@ dependencies = [
 [[package]]
 name = "waterui-controls"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "executor-core",
  "nami",
@@ -5279,7 +5278,7 @@ dependencies = [
 [[package]]
 name = "waterui-core"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "anyhow",
  "bitflags 2.13.2",
@@ -5295,7 +5294,7 @@ dependencies = [
 [[package]]
 name = "waterui-dylib"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "waterui-internal",
 ]
@@ -5303,7 +5302,7 @@ dependencies = [
 [[package]]
 name = "waterui-form"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "getrandom",
  "jiff",
@@ -5325,7 +5324,7 @@ dependencies = [
 [[package]]
 name = "waterui-graphics"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "arc-swap",
  "bytemuck",
@@ -5353,7 +5352,7 @@ dependencies = [
 [[package]]
 name = "waterui-icon"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "suiteki",
  "waterui-core",
@@ -5364,7 +5363,7 @@ dependencies = [
 [[package]]
 name = "waterui-image"
 version = "0.5.0"
-source = "git+https://github.com/water-rs/image?branch=dev#76eb42ae9e44618f929d7634c844bd85d2dd268e"
+source = "git+https://github.com/water-rs/image?branch=feat%2Fresponse-geometry#cbe859bcd16e04ec1e93b54bbd264a61f9b5b690"
 dependencies = [
  "executor-core",
  "half",
@@ -5382,7 +5381,7 @@ dependencies = [
 [[package]]
 name = "waterui-inspector-protocol"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "bincode 2.0.1",
  "bitflags 2.13.2",
@@ -5399,7 +5398,7 @@ dependencies = [
 [[package]]
 name = "waterui-internal"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "async-channel",
  "cpu-time",
@@ -5438,7 +5437,7 @@ dependencies = [
 [[package]]
 name = "waterui-layout"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "nami",
  "num-traits",
@@ -5450,7 +5449,7 @@ dependencies = [
 [[package]]
 name = "waterui-locale"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "fixed_decimal",
  "iana-time-zone",
@@ -5478,7 +5477,7 @@ dependencies = [
 [[package]]
 name = "waterui-macros"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "icu_locale_core",
  "proc-macro-crate",
@@ -5492,7 +5491,7 @@ dependencies = [
 [[package]]
 name = "waterui-map"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "nami",
  "suiteki",
@@ -5503,7 +5502,7 @@ dependencies = [
 [[package]]
 name = "waterui-media"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "blocking",
  "executor-core",
@@ -5524,12 +5523,12 @@ dependencies = [
 [[package]]
 name = "waterui-meta"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 
 [[package]]
 name = "waterui-navigation"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "nami",
  "waterui-controls",
@@ -5543,7 +5542,7 @@ dependencies = [
 [[package]]
 name = "waterui-preview-protocol"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "image",
  "serde",
@@ -5554,7 +5553,7 @@ dependencies = [
 [[package]]
 name = "waterui-shape"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "executor-core",
  "nami",
@@ -5582,7 +5581,7 @@ dependencies = [
 [[package]]
 name = "waterui-testing"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "accesskit",
  "cargo_metadata",
@@ -5604,7 +5603,7 @@ dependencies = [
 [[package]]
 name = "waterui-text"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "nami",
  "parley 0.12.0",
@@ -5624,7 +5623,7 @@ dependencies = [
 [[package]]
 name = "waterui-url"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "base64",
  "nami-core",
@@ -5634,12 +5633,12 @@ dependencies = [
 [[package]]
 name = "waterui-watcher-set"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 
 [[package]]
 name = "waterui-webview"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 dependencies = [
  "base64",
  "cookie",
@@ -5833,7 +5832,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core-deps-emscripten"
 version = "30.0.1"
-source = "git+https://github.com/water-rs/wgpu?branch=fix%2Fmetal-shared-memory-v30#59bd2fd583ed077030d3ed48db92ecf6e7b9b1e6"
+source = "git+https://github.com/water-rs/wgpu?branch=fix%2Fmetal-shared-memory-v30#9e0ab702c11f5db7b62670eaf9aeaf8a2f8ff7b5"
 dependencies = [
  "wgpu-hal",
 ]
@@ -6778,7 +6777,7 @@ source = "git+https://github.com/Dicklesworthstone/rust-block?rev=b39ae859d1ee8e
 [[patch.unused]]
 name = "cherenkov-cpu"
 version = "0.0.0"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 
 [[patch.unused]]
 name = "waterkit-audio"
@@ -6888,7 +6887,7 @@ source = "git+https://github.com/water-rs/particle?rev=bf663af85211d1f0bcce511b9
 [[patch.unused]]
 name = "waterui-video"
 version = "0.5.1"
-source = "git+https://github.com/water-rs/waterui?branch=dev#9e9f49072fbc47044df7a8b3ca31fed1f3bc05db"
+source = "git+https://github.com/water-rs/waterui?branch=feat%2F1323-response-geometry#2a8d9c600dee46e2be98b89bf4a37e8a44e66dcd"
 
 [[patch.unused]]
 name = "waterui-video-gpu"
