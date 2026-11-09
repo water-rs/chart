@@ -1770,7 +1770,7 @@ dependencies = [
 [[package]]
 name = "hydrolysis-m3"
 version = "0.3.1"
-source = "git+https://github.com/water-rs/hydrolysis-m3?branch=feat%2Fresponse-geometry#0979faf05ffa037c158e058f9aea75fdaa39323d"
+source = "git+https://github.com/water-rs/hydrolysis-m3?branch=dev#521eb8b8fd1d0e95c651ea872a15d501cc3b1a64"
 dependencies = [
  "hydrolysis",
  "material-color-utils",
@@ -5363,7 +5363,7 @@ dependencies = [
 [[package]]
 name = "waterui-image"
 version = "0.5.0"
-source = "git+https://github.com/water-rs/image?branch=feat%2Fresponse-geometry#cbe859bcd16e04ec1e93b54bbd264a61f9b5b690"
+source = "git+https://github.com/water-rs/image?branch=dev#5fd33037f929f42f0d2913998c782fa4cbd258a0"
 dependencies = [
  "executor-core",
  "half",
