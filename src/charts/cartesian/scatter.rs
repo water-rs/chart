@@ -9,7 +9,7 @@ use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
 use crate::charts::canvas::{
-    draw_scatter, interactive_cartesian_signal_canvas, point_bounds, point_geometry,
+    interactive_cartesian_signal_canvas, point_bounds, point_geometry, record_scatter,
 };
 use crate::composition::ChartComposition;
 use crate::data::DataPoint;
@@ -90,10 +90,8 @@ impl<S: Signal<Output = Vec<DataPoint>> + Clone + 'static> View for ScatterChart
             env,
             self.data,
             |data: &Vec<DataPoint>| point_bounds(data),
-            move |ctx, data, bounds| point_geometry(ctx, data, bounds, radius.max(8.0)),
-            move |ctx, data, geometry, _transition_alpha| {
-                draw_scatter(ctx, data, geometry.bounds, color, radius);
-            },
+            move |size, data, bounds| point_geometry(size, data, bounds, radius.max(8.0)),
+            move |cx, frame| record_scatter(cx, frame, color, radius),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

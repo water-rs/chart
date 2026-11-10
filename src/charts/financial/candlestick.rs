@@ -5,7 +5,8 @@ use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
 use crate::charts::canvas::{
-    candlestick_bounds, candlestick_geometry, draw_candlestick, interactive_cartesian_signal_canvas,
+    candlestick_bounds, candlestick_geometry, interactive_cartesian_signal_canvas,
+    record_candlestick,
 };
 use crate::composition::ChartComposition;
 use crate::data::Candle;
@@ -82,10 +83,8 @@ impl<S: Signal<Output = Vec<Candle>> + Clone + 'static> View for CandlestickChar
             env,
             self.data,
             |data: &Vec<Candle>| candlestick_bounds(data),
-            move |ctx, data, bounds| candlestick_geometry(ctx, data, bounds),
-            move |ctx, data, geometry, _transition_alpha| {
-                draw_candlestick(ctx, data, geometry.bounds, bullish_color, bearish_color);
-            },
+            move |size, data, bounds| candlestick_geometry(size, data, bounds),
+            move |cx, frame| record_candlestick(cx, frame, bullish_color, bearish_color),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

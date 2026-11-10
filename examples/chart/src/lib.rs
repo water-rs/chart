@@ -514,8 +514,8 @@ mod tests {
     /// Acceptance for the retained-tree refactor's two chart bugs:
     /// - **Bug 1** (tapping a mode button did not switch the chart): tapping a
     ///   different mode must change the rendered chart pixels. Each chart is a
-    ///   `Canvas`/`SceneView`; the old effect-slot-cursor patch path rendered the
-    ///   stale scene. The node-owned `SceneView` fixes it.
+    ///   `Canvas`; the old effect-slot-cursor patch path rendered the stale
+    ///   scene. The node-owned canvas recording fixes it.
     /// - **Bug 2** (layout flickered): switching to a different-size chart must
     ///   reflow the surrounding spacers cleanly via incremental relayout, with no
     ///   whole-window rebuild flash, and still render the new chart.
@@ -537,8 +537,8 @@ mod tests {
             .expect("save pie snapshot");
         assert!(
             pie.rgba8() != bar.rgba8(),
-            "Bug 1: tapping Pie must switch the rendered chart (a node-owned SceneView \
-             must render the new scene, not replay the stale Bar capture)"
+            "Bug 1: tapping Pie must switch the rendered chart (a node-owned canvas \
+             must render the new chart, not replay the stale Bar capture)"
         );
 
         // A different-size chart: the surrounding spacers must reflow without a flash.
