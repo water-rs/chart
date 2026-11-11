@@ -1,11 +1,13 @@
 //! The canvas every chart is drawn on.
 //!
-//! A chart's canvas closure runs once, at mount. It derives a [`Frame`] — the
-//! data, the geometry laid out for the canvas's current size, and the hit
-//! geometry — as a signal of the data, the viewport and `cx.size()`, and
-//! records the chart as keyed sub-recordings over that signal, so a change
-//! updates operands in place instead of recording again. A data change
-//! cross-fades between two layers whose opacity is a live, animated operand.
+//! A chart derives one [`Frame`] — the data, the geometry laid out for the
+//! canvas's current size, and the hit geometry — as a signal of the data, the
+//! viewport and the [`CanvasSize`] the canvas is laid out into. The canvas
+//! closure, which runs once at mount, records the chart as keyed
+//! sub-recordings over that signal, so a change updates operands in place
+//! instead of recording again; pointer input and chart composition read the
+//! same signal. A data change cross-fades between two layers whose opacity
+//! is a live, animated operand.
 
 extern crate alloc;
 
@@ -21,7 +23,7 @@ use waterui_core::{
     gesture::{DragEvent, DragGesture, GestureObserver, GesturePhase, TapEvent, TapGesture},
     layout::{Point, Size},
 };
-use waterui_graphics::canvas::{Canvas, Cx, Layer};
+use waterui_graphics::canvas::{Canvas, CanvasSize, Cx, Layer};
 
 pub(crate) use super::geometry::{
     area_bounds, area_geometry, bar_bounds, bar_geometry, bubble_bounds, bubble_geometry,
@@ -96,18 +98,16 @@ struct Showing<D> {
 /// Records `draw` over `frame` into two layers and keeps them showing the
 /// frame: a change of the geometry alone updates the showing layer in place;
 /// a change of the data records into the other layer and cross-fades to it
-/// under [`CHART_TRANSITION`]. Every frame is also published to `published`.
+/// under [`CHART_TRANSITION`].
 fn record_frames<D, G>(
     cx: &mut Cx,
     frame: &Computed<Frame<D, G>>,
-    published: Binding<Option<Frame<D, G>>>,
     draw: impl Fn(&mut Cx, &Computed<Frame<D, G>>) + 'static,
 ) where
     D: Clone + PartialEq + 'static,
     G: Clone + 'static,
 {
     let initial = frame.snapshot();
-    published.set(Some(initial.clone()));
     let showing = RefCell::new(Showing {
         active: 0,
         data: initial.data.clone(),
@@ -131,7 +131,6 @@ fn record_frames<D, G>(
 
     let follow = frame.watch(move |change| {
         let next = change.into_value();
-        published.set(Some(next.clone()));
         let mut showing = showing.borrow_mut();
         if showing.data == next.data {
             slots[showing.active].frame.set(next);
@@ -177,20 +176,14 @@ impl View for ChartCanvasAccessibilityBoundary {
 /// The chart's frame and plot area, as the signals chart composition lays
 /// out against.
 fn composition_frames<D: Clone + 'static, G: Clone + 'static>(
-    published: &Binding<Option<Frame<D, G>>>,
+    frame: &Computed<Frame<D, G>>,
     plot_area: impl Fn(&G) -> ChartViewport + Clone + 'static,
 ) -> (Computed<ChartViewport>, Computed<ChartViewport>) {
-    let chart_frame = published
-        .map(|frame| {
-            frame.map_or_else(ChartViewport::default, |frame| {
-                ChartViewport::new(0.0, 0.0, frame.size.width, frame.size.height)
-            })
-        })
+    let chart_frame = frame
+        .map(|frame| ChartViewport::new(0.0, 0.0, frame.size.width, frame.size.height))
         .computed();
-    let plot_area = published
-        .map(move |frame| {
-            frame.map_or_else(ChartViewport::default, |frame| plot_area(&frame.geometry))
-        })
+    let plot_area = frame
+        .map(move |frame| plot_area(&frame.geometry))
         .computed();
     (chart_frame, plot_area)
 }
@@ -229,38 +222,35 @@ where
     if selection.is_active() {
         selection = selection.persist_internal();
     }
-    let published = Binding::container(None::<CartesianFrame<D, T>>);
     let x_range_start = Binding::container(None::<f32>);
     let y_range_start = Binding::container(None::<f32>);
-    let canvas = {
-        let published = published.clone();
-        let viewport_state = cartesian_viewport.state_signal();
+    let size = CanvasSize::new();
+    let frame = {
         let cartesian_viewport = cartesian_viewport.clone();
-        Canvas::new(move |cx| {
-            let size = cx.size();
-            let frame = signal
-                .zip(&viewport_state)
-                .zip(&size)
-                .map(move |((data, viewport_state), size)| {
-                    let base_bounds = normalize_bounds(bounds_of(&data));
-                    let visible_bounds =
-                        cartesian_viewport.resolve_bounds(base_bounds, viewport_state);
-                    let geometry = build_geometry(size, &data, visible_bounds).within(base_bounds);
-                    Frame {
-                        data,
-                        geometry,
-                        size,
-                    }
-                })
-                .computed();
-            record_frames(cx, &frame, published, draw_chart);
-        })
+        signal
+            .zip(&cartesian_viewport.state_signal())
+            .zip(&size.signal())
+            .map(move |((data, viewport_state), size)| {
+                let base_bounds = normalize_bounds(bounds_of(&data));
+                let visible_bounds = cartesian_viewport.resolve_bounds(base_bounds, viewport_state);
+                let geometry = build_geometry(size, &data, visible_bounds).within(base_bounds);
+                Frame {
+                    data,
+                    geometry,
+                    size,
+                }
+            })
+            .computed()
+    };
+    let canvas = {
+        let frame = frame.clone();
+        Canvas::new(move |cx| record_frames(cx, &frame, draw_chart)).sized_by(size)
     };
     let canvas = ChartCanvasAccessibilityBoundary::new(canvas);
     let canvas = Metadata::new(
         canvas,
         GestureObserver::new(TapGesture::new(), {
-            let published = published.clone();
+            let frame = frame.clone();
             let selection = selection.clone();
             let cartesian_selection = cartesian_selection.clone();
             move |env: Environment| {
@@ -271,9 +261,7 @@ where
                     .get::<TapEvent>()
                     .expect("interactive_cartesian_signal_canvas: TapEvent missing from gesture environment");
                 let point = gesture_point_to_point(tap.location());
-                let Some(Frame { geometry, .. }) = published.snapshot() else {
-                    return;
-                };
+                let Frame { geometry, .. } = frame.snapshot();
                 let hit = geometry.hit_test(point);
                 selection.set_focus(hit.clone());
                 selection.set_selected(hit);
@@ -291,7 +279,7 @@ where
     let canvas = Metadata::new(
         canvas,
         GestureObserver::new(DragGesture::new(0.0), {
-            let published = published.clone();
+            let frame = frame.clone();
             let selection = selection.clone();
             let cartesian_selection = cartesian_selection;
             let cartesian_viewport = cartesian_viewport;
@@ -312,9 +300,7 @@ where
                 let drag_event = env.get::<DragEvent>().expect(
                     "interactive_cartesian_signal_canvas: DragEvent missing from gesture environment",
                 );
-                let Some(Frame { geometry, .. }) = published.snapshot() else {
-                    return;
-                };
+                let Frame { geometry, .. } = frame.snapshot();
                 let point = gesture_point_to_point(drag_event.location());
 
                 if handles_selection_drag {
@@ -490,10 +476,10 @@ where
         }),
     );
     let (chart_frame, plot_area_frame) =
-        composition_frames(&published, |geometry: &CartesianGeometry<T>| {
+        composition_frames(&frame, |geometry: &CartesianGeometry<T>| {
             geometry.viewport()
         });
-    let canvas = hover_events(canvas, &published, &selection);
+    let canvas = hover_events(canvas, &frame, &selection);
     composition.apply(canvas, chart_frame, plot_area_frame, &selection)
 }
 
@@ -525,26 +511,24 @@ where
         selection = selection.persist_internal();
     }
 
-    let published = Binding::container(None::<Frame<D, G>>);
-    let canvas = {
-        let published = published.clone();
-        Canvas::new(move |cx| {
-            let frame = signal
-                .zip(&cx.size())
-                .map(move |(data, size)| Frame {
-                    geometry: build_geometry(size, &data),
-                    data,
-                    size,
-                })
-                .computed();
-            record_frames(cx, &frame, published, draw_chart);
+    let size = CanvasSize::new();
+    let frame = signal
+        .zip(&size.signal())
+        .map(move |(data, size)| Frame {
+            geometry: build_geometry(size, &data),
+            data,
+            size,
         })
+        .computed();
+    let canvas = {
+        let frame = frame.clone();
+        Canvas::new(move |cx| record_frames(cx, &frame, draw_chart)).sized_by(size)
     };
     let canvas = ChartCanvasAccessibilityBoundary::new(canvas);
     let canvas = Metadata::new(
         canvas,
         GestureObserver::new(TapGesture::new(), {
-            let published = published.clone();
+            let frame = frame.clone();
             let selection = selection.clone();
             move |env: Environment| {
                 if !selection.is_active() {
@@ -553,11 +537,10 @@ where
                 let tap = env
                     .get::<TapEvent>()
                     .expect("interactive_signal_canvas: TapEvent missing from gesture environment");
-                let hit = published.snapshot().and_then(|frame| {
-                    frame
-                        .geometry
-                        .hit_test(gesture_point_to_point(tap.location()))
-                });
+                let hit = frame
+                    .snapshot()
+                    .geometry
+                    .hit_test(gesture_point_to_point(tap.location()));
                 selection.set_focus(hit.clone());
                 selection.set_selected(hit);
             }
@@ -566,7 +549,7 @@ where
     let canvas = Metadata::new(
         canvas,
         GestureObserver::new(DragGesture::new(0.0), {
-            let published = published.clone();
+            let frame = frame.clone();
             let selection = selection.clone();
             move |env: Environment| {
                 if !selection.is_active() {
@@ -576,11 +559,10 @@ where
                     "interactive_signal_canvas: DragEvent missing from gesture environment",
                 );
                 let hit_at = || {
-                    published.snapshot().and_then(|frame| {
-                        frame
-                            .geometry
-                            .hit_test(gesture_point_to_point(drag_event.location()))
-                    })
+                    frame
+                        .snapshot()
+                        .geometry
+                        .hit_test(gesture_point_to_point(drag_event.location()))
                 };
                 match drag_event.phase() {
                     GesturePhase::Started | GesturePhase::Updated => selection.set_focus(hit_at()),
@@ -594,8 +576,8 @@ where
         }),
     );
     let (chart_frame, plot_area_frame) =
-        composition_frames(&published, |geometry: &G| geometry.viewport());
-    let canvas = hover_events(canvas, &published, &selection);
+        composition_frames(&frame, |geometry: &G| geometry.viewport());
+    let canvas = hover_events(canvas, &frame, &selection);
     composition.apply(canvas, chart_frame, plot_area_frame, &selection)
 }
 
@@ -603,7 +585,7 @@ where
 /// focus, and leaving the chart clears it.
 fn hover_events<V, D, G, T>(
     canvas: V,
-    published: &Binding<Option<Frame<D, G>>>,
+    frame: &Computed<Frame<D, G>>,
     selection: &SelectionBindings<T>,
 ) -> impl View
 where
@@ -615,7 +597,7 @@ where
     let canvas = Metadata::new(
         canvas,
         OnEvent::new(Event::HoverMove, {
-            let published = published.clone();
+            let frame = frame.clone();
             let selection = selection.clone();
             move |env: Environment| {
                 if !selection.is_active() {
@@ -624,9 +606,7 @@ where
                 let hover = env
                     .get::<HoverEvent>()
                     .expect("hover_events: HoverEvent missing from event environment");
-                let hit = published
-                    .snapshot()
-                    .and_then(|frame| frame.geometry.hit_test(hover.location()));
+                let hit = frame.snapshot().geometry.hit_test(hover.location());
                 selection.set_focus(hit);
             }
         }),
