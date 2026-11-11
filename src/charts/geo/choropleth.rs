@@ -4,7 +4,7 @@ use nami::{Binding, Signal};
 use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
-use crate::charts::canvas::{choropleth_geometry, draw_choropleth, interactive_signal_canvas};
+use crate::charts::canvas::{choropleth_geometry, interactive_signal_canvas, record_choropleth};
 use crate::composition::ChartComposition;
 use crate::data::ChoroplethData;
 use crate::interaction::{HitResult, RegionDatum, SelectionBindings};
@@ -86,8 +86,8 @@ impl<S: Signal<Output = ChoroplethData> + Clone + 'static> View for ChoroplethCh
             env,
             self.data,
             choropleth_geometry,
-            move |ctx, data, _geometry, _transition_alpha| {
-                draw_choropleth(ctx, data, stroke_width, stroke_color, show_stroke);
+            move |cx, frame| {
+                record_choropleth(cx, frame, stroke_width, stroke_color, show_stroke);
             },
             self.selection,
             self.composition,

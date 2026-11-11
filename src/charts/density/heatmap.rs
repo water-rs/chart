@@ -3,7 +3,7 @@
 use nami::{Binding, Signal};
 use waterui_core::{Environment, View};
 
-use crate::charts::canvas::{draw_heatmap, heatmap_geometry, interactive_signal_canvas};
+use crate::charts::canvas::{heatmap_geometry, interactive_signal_canvas, record_heatmap};
 use crate::composition::ChartComposition;
 use crate::data::HeatmapData;
 use crate::interaction::{GridDatum, HitResult, SelectionBindings};
@@ -51,9 +51,7 @@ impl<S: Signal<Output = HeatmapData> + Clone + 'static> View for HeatmapChart<S>
             env,
             self.data,
             heatmap_geometry,
-            move |ctx, data, _geometry, _transition_alpha| {
-                draw_heatmap(ctx, data);
-            },
+            record_heatmap,
             self.selection,
             self.composition,
         )

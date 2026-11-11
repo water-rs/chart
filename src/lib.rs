@@ -1,7 +1,8 @@
-//! Chart components for `WaterUI` rendered through `Canvas`/`Scene2D`.
+//! Chart components for `WaterUI` drawn on `waterui_graphics::canvas::Canvas`.
 //!
-//! This crate provides chart visualizations on top of `WaterUI`'s scene pipeline,
-//! sharing one rendering path across native backends and hydrolysis.
+//! This crate provides chart visualizations whose drawing is recorded once per
+//! mount as keyed sub-recordings over live operands, so data, viewport and size
+//! changes update the retained drawing in place on every backend.
 //!
 //! # Chart Types
 //!

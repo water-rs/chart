@@ -3,7 +3,7 @@
 use nami::{Binding, Signal};
 use waterui_core::{Environment, View};
 
-use crate::charts::canvas::{contour_geometry, draw_contour, interactive_signal_canvas};
+use crate::charts::canvas::{contour_geometry, interactive_signal_canvas, record_contour};
 use crate::composition::ChartComposition;
 use crate::data::ContourData;
 use crate::interaction::{GridDatum, HitResult, SelectionBindings};
@@ -65,9 +65,7 @@ impl<S: Signal<Output = ContourData> + Clone + 'static> View for ContourChart<S>
             env,
             self.data,
             contour_geometry,
-            move |ctx, data, _geometry, transition_alpha| {
-                draw_contour(ctx, data, line_width, transition_alpha);
-            },
+            move |cx, frame| record_contour(cx, frame, line_width),
             self.selection,
             self.composition,
         )

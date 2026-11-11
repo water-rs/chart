@@ -5,7 +5,7 @@ use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
 use crate::charts::canvas::{
-    depth_bounds, depth_geometry, draw_depth, interactive_cartesian_signal_canvas,
+    depth_bounds, depth_geometry, interactive_cartesian_signal_canvas, record_depth,
 };
 use crate::composition::ChartComposition;
 use crate::data::DepthData;
@@ -91,16 +91,7 @@ impl<S: Signal<Output = DepthData> + Clone + 'static> View for DepthChart<S> {
             self.data,
             depth_bounds,
             depth_geometry,
-            move |ctx, data, geometry, transition_alpha| {
-                draw_depth(
-                    ctx,
-                    data,
-                    geometry.bounds,
-                    bid_color,
-                    ask_color,
-                    transition_alpha,
-                );
-            },
+            move |cx, frame| record_depth(cx, frame, bid_color, ask_color),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

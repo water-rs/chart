@@ -6,7 +6,7 @@ use nami::{Binding, Signal};
 use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
-use crate::charts::canvas::{draw_gauge, gauge_geometry, interactive_signal_canvas};
+use crate::charts::canvas::{gauge_geometry, interactive_signal_canvas, record_gauge};
 use crate::composition::ChartComposition;
 use crate::data::GaugeData;
 use crate::interaction::{HitResult, SelectionBindings, SliceDatum};
@@ -124,9 +124,9 @@ impl<S: Signal<Output = GaugeData> + Clone + 'static> View for GaugeChart<S> {
         interactive_signal_canvas(
             env,
             self.data,
-            move |ctx, data| {
+            move |size, data| {
                 gauge_geometry(
-                    ctx,
+                    size,
                     data,
                     start_angle,
                     end_angle,
@@ -134,10 +134,10 @@ impl<S: Signal<Output = GaugeData> + Clone + 'static> View for GaugeChart<S> {
                     outer_radius,
                 )
             },
-            move |ctx, data, _geometry, _transition_alpha| {
-                draw_gauge(
-                    ctx,
-                    data,
+            move |cx, frame| {
+                record_gauge(
+                    cx,
+                    frame,
                     start_angle,
                     end_angle,
                     inner_radius,

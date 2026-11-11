@@ -8,7 +8,7 @@ use nami::{Binding, Signal};
 use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
-use crate::charts::canvas::{draw_pie, interactive_signal_canvas, pie_geometry};
+use crate::charts::canvas::{interactive_signal_canvas, pie_geometry, record_pie};
 use crate::composition::ChartComposition;
 use crate::data::DataPoint;
 use crate::interaction::{HitResult, SelectionBindings, SliceDatum};
@@ -86,11 +86,8 @@ impl<S: Signal<Output = Vec<DataPoint>> + Clone + 'static> View for PieChart<S> 
         interactive_signal_canvas(
             env,
             self.data,
-            move |ctx, data| pie_geometry(ctx, data, inner_radius),
-            move |ctx, data, _geometry, _transition_alpha| {
-                let colors = colors.clone();
-                draw_pie(ctx, data, &colors, inner_radius);
-            },
+            move |size, data| pie_geometry(size, data, inner_radius),
+            move |cx, frame| record_pie(cx, frame, colors.clone(), inner_radius),
             self.selection,
             self.composition,
         )

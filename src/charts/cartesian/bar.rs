@@ -9,7 +9,7 @@ use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
 use crate::charts::canvas::{
-    bar_bounds, bar_geometry, draw_bar, interactive_cartesian_signal_canvas,
+    bar_bounds, bar_geometry, interactive_cartesian_signal_canvas, record_bar,
 };
 use crate::composition::ChartComposition;
 use crate::data::DataPoint;
@@ -76,10 +76,8 @@ impl<S: Signal<Output = Vec<DataPoint>> + Clone + 'static> View for BarChart<S> 
             env,
             self.data,
             |data: &Vec<DataPoint>| bar_bounds(data),
-            move |ctx, data, bounds| bar_geometry(ctx, data, bounds),
-            move |ctx, data, geometry, _transition_alpha| {
-                draw_bar(ctx, data, geometry.bounds, color);
-            },
+            move |size, data, bounds| bar_geometry(size, data, bounds),
+            move |cx, frame| record_bar(cx, frame, color),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,
