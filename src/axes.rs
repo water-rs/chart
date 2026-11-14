@@ -203,8 +203,7 @@ impl<C: View + 'static> View for ChartAxes<C> {
             .map(move |bounds: DataBounds| {
                 y_axis
                     .as_ref()
-                    .map(|axis| axis.compute_ticks(bounds.min_y, bounds.max_y))
-                    .unwrap_or_default()
+                    .map_or_default(|axis| axis.compute_ticks(bounds.min_y, bounds.max_y))
                     .into_iter()
                     .map(ReactiveTick)
                     .collect()
@@ -215,8 +214,7 @@ impl<C: View + 'static> View for ChartAxes<C> {
             .map(move |bounds: DataBounds| {
                 x_axis
                     .as_ref()
-                    .map(|axis| axis.compute_ticks(bounds.min_x, bounds.max_x))
-                    .unwrap_or_default()
+                    .map_or_default(|axis| axis.compute_ticks(bounds.min_x, bounds.max_x))
                     .into_iter()
                     .map(ReactiveTick)
                     .collect()
