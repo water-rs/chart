@@ -2,7 +2,7 @@
 
 use core::ops::RangeInclusive;
 
-use nami::{Binding, Computed, SignalExt as _};
+use nami::{Binding, Computed, Signal, SignalExt as _};
 use waterui_core::{IntoSignalF32, layout::Point};
 
 /// Stable screen-space anchor for chart readouts and overlays.
@@ -521,7 +521,7 @@ impl CartesianViewportBindings {
 }
 
 fn f32_binding_needs_update(binding: &Binding<f32>, value: f32) -> bool {
-    binding.get().to_bits() != value.to_bits()
+    binding.snapshot().to_bits() != value.to_bits()
 }
 
 fn resolve_axis_window(
@@ -618,7 +618,7 @@ impl CartesianSelectionBindings {
 
     pub fn set_x_value(&self, value: Option<f32>) {
         if let Some(binding) = &self.x_value
-            && binding.get() != value
+            && binding.snapshot() != value
         {
             binding.set(value);
         }
@@ -626,7 +626,7 @@ impl CartesianSelectionBindings {
 
     pub fn set_x_range(&self, value: Option<RangeInclusive<f32>>) {
         if let Some(binding) = &self.x_range
-            && binding.get() != value
+            && binding.snapshot() != value
         {
             binding.set(value);
         }
@@ -634,7 +634,7 @@ impl CartesianSelectionBindings {
 
     pub fn set_y_value(&self, value: Option<f32>) {
         if let Some(binding) = &self.y_value
-            && binding.get() != value
+            && binding.snapshot() != value
         {
             binding.set(value);
         }
@@ -642,7 +642,7 @@ impl CartesianSelectionBindings {
 
     pub fn set_y_range(&self, value: Option<RangeInclusive<f32>>) {
         if let Some(binding) = &self.y_range
-            && binding.get() != value
+            && binding.snapshot() != value
         {
             binding.set(value);
         }
@@ -828,19 +828,19 @@ impl<T: Clone + PartialEq + 'static> SelectionBindings<T> {
     }
 
     pub fn set_focus(&self, value: Option<HitResult<T>>) {
-        if self.focused_flags.track && self.focused.get() != value {
+        if self.focused_flags.track && self.focused.snapshot() != value {
             self.focused.set(value);
         }
     }
 
     pub fn clear_focus(&self) {
-        if self.focused_flags.track && self.focused.get().is_some() {
+        if self.focused_flags.track && self.focused.snapshot().is_some() {
             self.focused.set(None);
         }
     }
 
     pub fn set_selected(&self, value: Option<HitResult<T>>) {
-        if self.selected_flags.track && self.selected.get() != value {
+        if self.selected_flags.track && self.selected.snapshot() != value {
             self.selected.set(value);
         }
     }
@@ -862,6 +862,6 @@ mod tests {
             .activate_proxy()
             .persist_internal();
 
-        assert_eq!(second.selected_signal().get(), None);
+        assert_eq!(second.selected_signal().snapshot(), None);
     }
 }

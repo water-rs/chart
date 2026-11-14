@@ -9,7 +9,7 @@ use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
 use crate::charts::canvas::{
-    draw_line, interactive_cartesian_signal_canvas, point_bounds, point_geometry,
+    interactive_cartesian_signal_canvas, point_bounds, point_geometry, record_line,
 };
 use crate::composition::ChartComposition;
 use crate::data::DataPoint;
@@ -111,18 +111,11 @@ impl<S: Signal<Output = Vec<DataPoint>> + Clone + 'static> View for LineChart<S>
             env,
             self.data,
             |data: &Vec<DataPoint>| point_bounds(data),
-            move |ctx, data, bounds| point_geometry(ctx, data, bounds, (line_width * 2.5).max(8.0)),
-            move |ctx, data, geometry, transition_alpha| {
-                draw_line(
-                    ctx,
-                    data,
-                    geometry.bounds,
-                    color,
-                    line_width,
-                    show_fill,
-                    fill_opacity,
-                    transition_alpha,
-                );
+            move |size, data, bounds| {
+                point_geometry(size, data, bounds, (line_width * 2.5).max(8.0))
+            },
+            move |cx, frame| {
+                record_line(cx, frame, color, line_width, show_fill, fill_opacity);
             },
             self.selection,
             self.cartesian_selection,

@@ -5,7 +5,7 @@ use core::num::NonZeroU32;
 use nami::{Binding, Signal};
 use waterui_core::{Environment, View};
 
-use crate::charts::canvas::{draw_radar, interactive_signal_canvas, radar_geometry};
+use crate::charts::canvas::{interactive_signal_canvas, radar_geometry, record_radar};
 use crate::composition::ChartComposition;
 use crate::data::RadarData;
 use crate::interaction::{HitResult, RadarDatum, SelectionBindings};
@@ -116,16 +116,7 @@ impl<S: Signal<Output = RadarData> + Clone + 'static> View for RadarChart<S> {
             env,
             self.data,
             radar_geometry,
-            move |ctx, data, _geometry, transition_alpha| {
-                draw_radar(
-                    ctx,
-                    data,
-                    ring_count,
-                    line_width,
-                    fill_opacity,
-                    transition_alpha,
-                );
-            },
+            move |cx, frame| record_radar(cx, frame, ring_count, line_width, fill_opacity),
             self.selection,
             self.composition,
         )

@@ -5,7 +5,7 @@ use waterui_core::{Environment, View};
 use waterui_graphics::color::Srgb;
 
 use crate::charts::canvas::{
-    bubble_bounds, bubble_geometry, draw_bubble, interactive_cartesian_signal_canvas,
+    bubble_bounds, bubble_geometry, interactive_cartesian_signal_canvas, record_bubble,
 };
 use crate::composition::ChartComposition;
 use crate::data::BubblePoint;
@@ -121,19 +121,8 @@ impl<S: Signal<Output = Vec<BubblePoint>> + Clone + 'static> View for BubbleChar
             env,
             self.data,
             |data: &Vec<BubblePoint>| bubble_bounds(data),
-            move |ctx, data, bounds| bubble_geometry(ctx, data, bounds, min_radius, max_radius),
-            move |ctx, data, geometry, transition_alpha| {
-                draw_bubble(
-                    ctx,
-                    data,
-                    geometry.bounds,
-                    color,
-                    min_radius,
-                    max_radius,
-                    opacity,
-                    transition_alpha,
-                );
-            },
+            move |size, data, bounds| bubble_geometry(size, data, bounds, min_radius, max_radius),
+            move |cx, frame| record_bubble(cx, frame, color, min_radius, max_radius, opacity),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

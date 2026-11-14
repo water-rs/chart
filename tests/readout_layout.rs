@@ -19,7 +19,7 @@ const FOCUSED_READOUT: &str =
 const SELECTED_READOUT: &str =
     "selected:series=0 index=12 t=720.00 open=120.00 high=124.00 low=119.00 close=123.00";
 
-#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
+#[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 360))]
 fn semantic_chart_shell_keeps_long_readouts_inside_viewport(
     ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
 ) {

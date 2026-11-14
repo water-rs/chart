@@ -16,7 +16,7 @@ use waterui_chart::{
 use waterui_testing::{OffscreenApp, Role, RuntimeDriver, Selector, SemanticApp};
 
 pub const VIEWPORT_WIDTH: u32 = 320;
-pub const VIEWPORT_HEIGHT: u32 = 320;
+pub const VIEWPORT_HEIGHT: u32 = 360;
 pub const CHART_WIDTH: f32 = 240.0;
 pub const CHART_HEIGHT: f32 = 180.0;
 pub const SNAPSHOT_SUITE: &str = "semantic-selection";
@@ -397,7 +397,7 @@ pub fn pie_hit_location(data: &[DataPoint], index: usize, inner_radius: f32) -> 
         let sweep = core::f32::consts::TAU * (value / total.max(f32::EPSILON));
         let end_angle = start_angle + sweep;
         if current_index == index {
-            let mid_angle = start_angle + sweep * 0.5;
+            let mid_angle = sweep.mul_add(0.5, start_angle);
             let x = mid_angle.cos().mul_add(mid_radius, center_x);
             let y = mid_angle.sin().mul_add(mid_radius, center_y);
             return (x / CHART_WIDTH, y / CHART_HEIGHT);

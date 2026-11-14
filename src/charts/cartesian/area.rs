@@ -4,7 +4,7 @@ use nami::{Binding, Signal};
 use waterui_core::{Environment, View};
 
 use crate::charts::canvas::{
-    area_bounds, area_geometry, draw_area, interactive_cartesian_signal_canvas,
+    area_bounds, area_geometry, interactive_cartesian_signal_canvas, record_area,
 };
 use crate::composition::ChartComposition;
 use crate::data::AreaData;
@@ -62,9 +62,7 @@ impl<S: Signal<Output = AreaData> + Clone + 'static> View for AreaChart<S> {
             self.data,
             area_bounds,
             area_geometry,
-            move |ctx, data, geometry, transition_alpha| {
-                draw_area(ctx, data, geometry.bounds, transition_alpha);
-            },
+            record_area,
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,
