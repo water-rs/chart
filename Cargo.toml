@@ -75,34 +75,34 @@ block = { git = "https://github.com/Dicklesworthstone/rust-block", rev = "b39ae8
 # through. Every `waterui-*` crate in the graph must resolve to this one commit — a registry
 # `waterui-core` beside the facade's own path dependencies gives two `View`
 # traits in one graph.
-waterui = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-assets = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-assets-core = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-assets-macros = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-assets-planner = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-backend-core = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-controls = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-core = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-dylib = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-form = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-graphics = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-icon = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-inspector-protocol = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-internal = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-layout = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-locale = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-macros = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-map = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-media = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-navigation = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-preview-protocol = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-shape = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-testing = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-text = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-url = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-video = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-watcher-set = { git = "https://github.com/water-rs/waterui", branch = "main" }
-waterui-webview = { git = "https://github.com/water-rs/waterui", branch = "main" }
+waterui = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-assets = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-assets-core = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-assets-macros = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-assets-planner = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-backend-core = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-controls = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-core = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-dylib = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-form = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-graphics = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-icon = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-inspector-protocol = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-internal = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-layout = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-locale = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-macros = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-map = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-media = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-navigation = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-preview-protocol = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-shape = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-testing = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-text = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-url = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-video = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-watcher-set = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+waterui-webview = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
 
 # Extracted component crates. The ones moving to nami 0.13 alongside this
 # crate (barcode, map-gpu, math, video-gpu) ride their own
@@ -123,7 +123,7 @@ waterui-video-gpu = { git = "https://github.com/water-rs/video-gpu", branch = "m
 # (water-rs/waterui#1428), so it resolves from the same framework commit
 # as every `waterui-*` crate; its Material 3 theme is still external and
 # follows its `dev`, as the framework's does.
-hydrolysis = { git = "https://github.com/water-rs/waterui", branch = "main" }
+hydrolysis = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
 hydrolysis-m3 = { git = "https://github.com/water-rs/hydrolysis-m3", branch = "main" }
 
 # suiteki 0.1.1 on crates.io implements nami-core 0.3's `Signal`; suiteki's
@@ -137,12 +137,12 @@ suiteki = { git = "https://github.com/water-rs/suiteki", branch = "main" }
 # members are the filter library `.filter(F)`/`.effect(E)` and the engine
 # agree on — every filtrate in the graph must come from this same commit
 # or a filter built on one side is a different type on the other.
-cherenkov = { git = "https://github.com/water-rs/waterui", branch = "main" }
-cherenkov-cpu = { git = "https://github.com/water-rs/waterui", branch = "main" }
-cherenkov-gpu = { git = "https://github.com/water-rs/waterui", branch = "main" }
-filtrate = { git = "https://github.com/water-rs/waterui", branch = "main" }
-filtrate-core = { git = "https://github.com/water-rs/waterui", branch = "main" }
-filtrate-derive = { git = "https://github.com/water-rs/waterui", branch = "main" }
+cherenkov = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+cherenkov-cpu = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+cherenkov-gpu = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+filtrate = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+filtrate-core = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
+filtrate-derive = { git = "https://github.com/water-rs/waterui", branch = "refactor/stretch-axis-from-realized-nodes" }
 
 # Every waterkit crate the codec graph shares types across rides the same
 # commit — a registry `waterkit-core` beside the patched `waterkit-codec` gives
