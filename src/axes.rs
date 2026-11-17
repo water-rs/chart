@@ -232,10 +232,6 @@ impl<C: View + 'static> View for ChartAxes<C> {
             AxisAccessibilityBoundary::new(axis_titles(y_label, x_label)),
         ))
     }
-
-    fn stretch_axis(&self) -> StretchAxis {
-        StretchAxis::Both
-    }
 }
 
 fn grid_color() -> Color {
@@ -388,10 +384,6 @@ impl View for ReactiveAxisTick {
 
         absolute((grid, label))
     }
-
-    fn stretch_axis(&self) -> StretchAxis {
-        StretchAxis::Both
-    }
 }
 
 struct ReactiveAxis {
@@ -434,10 +426,6 @@ impl View for ReactiveAxis {
                 },
             ),
         )
-    }
-
-    fn stretch_axis(&self) -> StretchAxis {
-        StretchAxis::Both
     }
 }
 
