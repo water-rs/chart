@@ -1,6 +1,6 @@
 //! Chart example demonstrating all chart types.
 
-use waterui::app::App;
+use waterui::app::{App, Windows};
 use waterui::color::Srgb;
 use waterui::layout::grid::{grid as layout_grid, row};
 use waterui::prelude::*;
@@ -487,7 +487,7 @@ fn gauge_chart_preview() -> impl View {
         .size(300.0, 300.0)
 }
 
-pub fn app(env: Environment) -> App {
+pub fn app(env: Environment) -> App<impl Windows> {
     App::new(demo, env)
 }
 

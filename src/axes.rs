@@ -13,7 +13,7 @@ use alloc::{
 
 use nami::signal::IntoComputed;
 use nami::{Computed, SignalExt, collection::SignalCollection};
-use waterui_core::accessibility::{AccessibilityLabel, AccessibilityRole};
+use waterui_accessibility::{AccessibilityLabel, AccessibilityRole};
 use waterui_core::{AnyView, Environment, Metadata, View, id::Identifiable, views::ForEach};
 use waterui_graphics::color::Color;
 use waterui_layout::container::{FixedContainer, LazyContainer};
