@@ -10,10 +10,8 @@ extern crate alloc;
 use alloc::vec::Vec;
 use core::f32::consts::TAU;
 
-use waterui_core::{
-    gesture::GesturePoint,
-    layout::{Point, Rect},
-};
+use waterui_core::layout::{Point, Rect};
+use waterui_interaction::gesture::GesturePoint;
 
 use crate::{
     data::DataBounds,

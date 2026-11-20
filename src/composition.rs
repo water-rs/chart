@@ -3,7 +3,7 @@ extern crate alloc;
 use alloc::rc::Rc;
 
 use nami::{Computed, SignalExt};
-use waterui_core::accessibility::{AccessibilityLabel, AccessibilityRole};
+use waterui_accessibility::{AccessibilityLabel, AccessibilityRole};
 use waterui_core::{AnyView, Environment, Metadata, View};
 use waterui_layout::background::background;
 use waterui_layout::overlay::Overlay;

@@ -15,15 +15,17 @@ use alloc::rc::Rc;
 use core::{cell::RefCell, time::Duration};
 
 use nami::{Binding, Computed, Signal, SignalExt as _};
+use waterui_accessibility::{AccessibilityHidden, AccessibilityRole};
 use waterui_core::{
     AnyView, Environment, Metadata, View,
-    accessibility::{AccessibilityHidden, AccessibilityRole},
     animation::Animation,
-    event::{Event, HoverEvent, OnEvent},
-    gesture::{DragEvent, DragGesture, GestureObserver, GesturePhase, TapEvent, TapGesture},
     layout::{Point, Size},
 };
 use waterui_graphics::canvas::{Canvas, CanvasSize, Cx, Layer};
+use waterui_interaction::event::{Event, HoverEvent, OnEvent};
+use waterui_interaction::gesture::{
+    DragEvent, DragGesture, GestureObserver, GesturePhase, TapEvent, TapGesture,
+};
 
 pub(crate) use super::geometry::{
     area_bounds, area_geometry, bar_bounds, bar_geometry, bubble_bounds, bubble_geometry,
