@@ -46,7 +46,9 @@ fn mount<V: View + 'static>(chart: impl Fn() -> V + 'static) -> OffscreenApp {
 }
 
 fn export(app: &mut OffscreenApp, name: &str) {
-    app.snapshot()
+    let captured = app.capture_snapshot("render_charts", name, "00_rendered");
+    captured
+        .snapshot()
         .save_png(output(name))
         .expect("the frame must be written");
 }

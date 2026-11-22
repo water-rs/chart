@@ -157,12 +157,22 @@ jobs:
       - run: cargo check -p waterui-chart --all-features
       - run: cargo check --workspace
 
+  gallery:
+    name: Visual Gallery
+    needs: bump
+    uses: water-rs/.github/.github/workflows/visual-gallery.yml@main
+    with:
+      artifact-name: waterui-chart-gallery
+      packages: -p waterui-chart
+      gpu-features: --all-features
+      nextest-args: --test render_charts
+
   result:
     # The single check the `main` ruleset requires: it passes when every
     # job passed or was skipped (release-plz bump pull requests skip all).
     name: CI result
     if: always()
-    needs: [bump, test, lint, msrv]
+    needs: [bump, test, lint, msrv, gallery]
     runs-on: ubuntu-latest
     steps:
       - name: Check job results
