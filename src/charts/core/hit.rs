@@ -11,7 +11,6 @@ use alloc::vec::Vec;
 use core::f32::consts::TAU;
 
 use waterui_core::layout::{Point, Rect};
-use waterui_interaction::gesture::GesturePoint;
 
 use crate::{
     data::DataBounds,
@@ -206,10 +205,6 @@ impl<T: Clone + 'static> HitGeometry<T> for CartesianGeometry<T> {
     fn viewport(&self) -> ChartViewport {
         self.viewport
     }
-}
-
-pub const fn gesture_point_to_point(point: GesturePoint) -> Point {
-    Point::new(point.x, point.y)
 }
 
 fn distance_squared(a: Point, b: Point) -> f32 {
