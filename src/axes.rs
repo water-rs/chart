@@ -22,7 +22,7 @@ use waterui_layout::{
     AbsoluteLayout, Layout, LayoutError, PlacementInput, Point, PositionExt, ProposalSize, Rect,
     Size, StretchAxis, SubView, SubviewPlacement, UnitPoint, absolute,
 };
-use waterui_text::{Text, text};
+use waterui_text::{Text, font::FontWeight, text};
 
 use crate::axis::{AxisConfig, Tick};
 use crate::data::DataBounds;
@@ -432,20 +432,16 @@ impl View for ReactiveAxis {
 fn axis_titles(y_label: Option<Text>, x_label: Option<Text>) -> impl View {
     absolute((
         y_label.map(|label| {
-            label.size(12.0).bold().position_in_offset(
-                UnitPoint::TOP_LEADING,
-                UnitPoint::TOP_LEADING,
-                2.0,
-                2.0,
-            )
+            label
+                .size(12.0)
+                .weight(FontWeight::Bold)
+                .position_in_offset(UnitPoint::TOP_LEADING, UnitPoint::TOP_LEADING, 2.0, 2.0)
         }),
         x_label.map(|label| {
-            label.size(12.0).bold().position_in_offset(
-                UnitPoint::BOTTOM,
-                UnitPoint::BOTTOM,
-                0.0,
-                -2.0,
-            )
+            label
+                .size(12.0)
+                .weight(FontWeight::Bold)
+                .position_in_offset(UnitPoint::BOTTOM, UnitPoint::BOTTOM, 0.0, -2.0)
         }),
     ))
 }

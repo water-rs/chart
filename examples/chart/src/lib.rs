@@ -6,6 +6,7 @@ use waterui::layout::grid::{grid as layout_grid, row};
 use waterui::prelude::*;
 use waterui::preview;
 use waterui::reactive::{binding, impl_constant, Binding};
+use waterui::text::font::FontWeight;
 use waterui_chart::{
     ArcAngles, AreaChart, AreaData, AreaSeries, AxisConfig, BarChart, BubbleChart, BubblePoint,
     Candle, CandlestickChart, ChartExt, ContourChart, ContourData, DataBounds, DataPoint,
@@ -151,7 +152,10 @@ pub fn demo() -> impl View {
     zstack((
         Color::srgb_hex("#1a1a2e"),
         vstack((
-            text("Charts Demo").title().bold().foreground(Srgb::WHITE),
+            text("Charts Demo")
+                .title()
+                .weight(FontWeight::Bold)
+                .foreground(Srgb::WHITE),
             mode_controls(&mode),
             spacer(),
             chart_layers(&mode),
