@@ -41,10 +41,7 @@ pub(crate) use super::record::{
 };
 use super::{
     geometry::normalize_bounds,
-    hit::{
-        cartesian_x_from_point, cartesian_y_from_point, gesture_point_to_point,
-        normalized_scalar_range,
-    },
+    hit::{cartesian_x_from_point, cartesian_y_from_point, normalized_scalar_range},
 };
 use crate::{
     composition::ChartComposition,
@@ -262,7 +259,8 @@ where
                 let tap = env
                     .get::<TapEvent>()
                     .expect("interactive_cartesian_signal_canvas: TapEvent missing from gesture environment");
-                let point = gesture_point_to_point(tap.location());
+                let location = tap.location();
+                let point = Point::new(location.x, location.y);
                 let Frame { geometry, .. } = frame.snapshot();
                 let hit = geometry.hit_test(point);
                 selection.set_focus(hit.clone());
@@ -303,7 +301,8 @@ where
                     "interactive_cartesian_signal_canvas: DragEvent missing from gesture environment",
                 );
                 let Frame { geometry, .. } = frame.snapshot();
-                let point = gesture_point_to_point(drag_event.location());
+                let location = drag_event.location();
+                let point = Point::new(location.x, location.y);
 
                 if handles_selection_drag {
                     match drag_event.phase() {
@@ -539,10 +538,11 @@ where
                 let tap = env
                     .get::<TapEvent>()
                     .expect("interactive_signal_canvas: TapEvent missing from gesture environment");
+                let location = tap.location();
                 let hit = frame
                     .snapshot()
                     .geometry
-                    .hit_test(gesture_point_to_point(tap.location()));
+                    .hit_test(Point::new(location.x, location.y));
                 selection.set_focus(hit.clone());
                 selection.set_selected(hit);
             }
@@ -561,10 +561,11 @@ where
                     "interactive_signal_canvas: DragEvent missing from gesture environment",
                 );
                 let hit_at = || {
+                    let location = drag_event.location();
                     frame
                         .snapshot()
                         .geometry
-                        .hit_test(gesture_point_to_point(drag_event.location()))
+                        .hit_test(Point::new(location.x, location.y))
                 };
                 match drag_event.phase() {
                     GesturePhase::Started | GesturePhase::Updated => selection.set_focus(hit_at()),
