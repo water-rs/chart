@@ -492,7 +492,7 @@ fn gauge_chart_preview() -> impl View {
 }
 
 pub fn app(env: Environment) -> App<impl Windows> {
-    App::new(demo, env)
+    App::new(env).window(Window::new("", demo))
 }
 
 #[cfg(test)]
