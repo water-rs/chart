@@ -1,8 +1,8 @@
 //! Bubble chart component.
 
-use nami::{Binding, Signal};
+use nami::{Binding, Signal, signal::IntoComputed};
 use waterui_core::{Environment, View};
-use waterui_graphics::color::Srgb;
+use waterui_graphics::color::Color;
 
 use crate::charts::canvas::{
     bubble_bounds, bubble_geometry, interactive_cartesian_signal_canvas, record_bubble,
@@ -13,11 +13,12 @@ use crate::interaction::{
     CartesianSelectionBindings, CartesianViewportBindings, HitResult, SelectionBindings,
 };
 use crate::params::{PositiveF32, UnitInterval};
+use crate::theme_color::into_color;
 
 /// Bubble chart for 3D data visualization.
 pub struct BubbleChart<S: Signal<Output = Vec<BubblePoint>>> {
     data: S,
-    color: Srgb,
+    color: Color,
     min_radius: f32,
     max_radius: f32,
     opacity: f32,
@@ -35,7 +36,7 @@ impl<S: Signal<Output = Vec<BubblePoint>>> BubbleChart<S> {
     pub fn new(data: S) -> Self {
         Self {
             data,
-            color: Srgb::new(0.23, 0.51, 0.96),
+            color: Color::accent(),
             min_radius: 5.0,
             max_radius: 30.0,
             opacity: 0.7,
@@ -52,8 +53,8 @@ impl<S: Signal<Output = Vec<BubblePoint>>> BubbleChart<S> {
 
     /// Sets the bubble fill color.
     #[must_use]
-    pub const fn color(mut self, color: Srgb) -> Self {
-        self.color = color;
+    pub fn color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.color = into_color(color);
         self
     }
 
@@ -113,7 +114,8 @@ impl<S: Signal<Output = Vec<BubblePoint>>> BubbleChart<S> {
 
 impl<S: Signal<Output = Vec<BubblePoint>> + Clone + 'static> View for BubbleChart<S> {
     fn body(self, env: &Environment) -> impl View {
-        let color = self.color;
+        let color = self.color.resolve(env);
+        let draw_env = env.clone();
         let min_radius = self.min_radius;
         let max_radius = self.max_radius;
         let opacity = self.opacity;
@@ -122,7 +124,11 @@ impl<S: Signal<Output = Vec<BubblePoint>> + Clone + 'static> View for BubbleChar
             self.data,
             |data: &Vec<BubblePoint>| bubble_bounds(data),
             move |size, data, bounds| bubble_geometry(size, data, bounds, min_radius, max_radius),
-            move |cx, frame| record_bubble(cx, frame, color, min_radius, max_radius, opacity),
+            move |cx, frame| {
+                record_bubble(
+                    cx, frame, &draw_env, &color, min_radius, max_radius, opacity,
+                );
+            },
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

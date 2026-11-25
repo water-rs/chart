@@ -5,12 +5,14 @@ use waterui_core::{Environment, View};
 
 use crate::charts::canvas::{heatmap_geometry, interactive_signal_canvas, record_heatmap};
 use crate::composition::ChartComposition;
-use crate::data::HeatmapData;
+use crate::data::{ColorScale, HeatmapData};
 use crate::interaction::{GridDatum, HitResult, SelectionBindings};
+use crate::theme_color::resolve_color_scale;
 
 /// Heatmap chart for matrix visualization.
 pub struct HeatmapChart<S: Signal<Output = HeatmapData>> {
     data: S,
+    color_scale: ColorScale,
     selection: SelectionBindings<GridDatum>,
     composition: ChartComposition<GridDatum>,
 }
@@ -23,12 +25,20 @@ impl<S: Signal<Output = HeatmapData>> HeatmapChart<S> {
     pub fn new(data: S) -> Self {
         Self {
             data,
+            color_scale: ColorScale::default(),
             selection: SelectionBindings::new(),
             composition: ChartComposition::default(),
         }
     }
 
     crate::composition::chart_composition_methods!(GridDatum);
+
+    /// Sets the color scale used to map cell values to colors.
+    #[must_use]
+    pub fn color_scale(mut self, scale: ColorScale) -> Self {
+        self.color_scale = scale;
+        self
+    }
 
     /// Tracks the currently focused heatmap cell in an external binding.
     #[must_use]
@@ -47,11 +57,12 @@ impl<S: Signal<Output = HeatmapData>> HeatmapChart<S> {
 
 impl<S: Signal<Output = HeatmapData> + Clone + 'static> View for HeatmapChart<S> {
     fn body(self, env: &Environment) -> impl View {
+        let color_scale = resolve_color_scale(&self.color_scale, env);
         interactive_signal_canvas(
             env,
             self.data,
             heatmap_geometry,
-            record_heatmap,
+            move |cx, frame| record_heatmap(cx, frame, &color_scale),
             self.selection,
             self.composition,
         )

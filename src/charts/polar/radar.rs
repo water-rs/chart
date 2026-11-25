@@ -109,6 +109,7 @@ impl<S: Signal<Output = RadarData>> RadarChart<S> {
 
 impl<S: Signal<Output = RadarData> + Clone + 'static> View for RadarChart<S> {
     fn body(self, env: &Environment) -> impl View {
+        let draw_env = env.clone();
         let ring_count = self.ring_count;
         let line_width = self.line_width;
         let fill_opacity = self.fill_opacity;
@@ -116,7 +117,9 @@ impl<S: Signal<Output = RadarData> + Clone + 'static> View for RadarChart<S> {
             env,
             self.data,
             radar_geometry,
-            move |cx, frame| record_radar(cx, frame, ring_count, line_width, fill_opacity),
+            move |cx, frame| {
+                record_radar(cx, frame, &draw_env, ring_count, line_width, fill_opacity);
+            },
             self.selection,
             self.composition,
         )

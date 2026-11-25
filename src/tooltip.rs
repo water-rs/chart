@@ -4,17 +4,20 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 
-use nami::{Computed, SignalExt as _};
+use nami::{Computed, SignalExt as _, signal::IntoComputed};
 use waterui_core::{AnyView, Dynamic, Environment, View};
-use waterui_graphics::color::{Color, Srgb};
+use waterui_graphics::color::Color;
 use waterui_layout::frame::Frame;
 use waterui_layout::padding::{EdgeInsets, Padding};
-use waterui_layout::stack::{HStack, HorizontalAlignment, VStack, VerticalAlignment};
+use waterui_layout::stack::{
+    Alignment, HStack, HorizontalAlignment, VStack, VerticalAlignment, ZStack,
+};
 use waterui_layout::{PositionExt, UnitPoint, absolute};
 use waterui_shape::{CornerRadius, RoundedRectangle, ShapeExt};
 use waterui_text::{IntoText, Text};
 
 use crate::interaction::{ChartViewport, HitResult};
+use crate::theme_color::into_color;
 
 const TOOLTIP_EDGE_INSET: f32 = 8.0;
 const TOOLTIP_ANCHOR_GAP: f32 = 12.0;
@@ -38,7 +41,7 @@ pub struct TooltipValue {
     /// The value to display.
     pub value: Text,
     /// Optional color indicator.
-    pub color: Option<Srgb>,
+    pub color: Option<Color>,
 }
 
 impl TooltipValue {
@@ -54,8 +57,8 @@ impl TooltipValue {
 
     /// Sets the color indicator.
     #[must_use]
-    pub fn color(mut self, color: impl Into<Srgb>) -> Self {
-        self.color = Some(color.into());
+    pub fn color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.color = Some(into_color(color));
         self
     }
 }
@@ -87,7 +90,7 @@ impl TooltipContent {
         mut self,
         label: impl IntoText,
         value: impl IntoText,
-        color: impl Into<Srgb>,
+        color: impl IntoComputed<Color>,
     ) -> Self {
         self.values
             .push(TooltipValue::new(label, value).color(color));
@@ -108,7 +111,7 @@ impl TooltipContent {
 /// # Example
 ///
 /// ```rust
-/// use waterui::color::Srgb;
+/// use waterui::theme::color::SurfaceVariant;
 /// use waterui_chart::{Tooltip, TooltipContent};
 ///
 /// Tooltip::new(
@@ -117,13 +120,13 @@ impl TooltipContent {
 ///         .value("X", "10.5")
 ///         .value("Y", "25.3"),
 /// )
-/// .background_color(Srgb::from_hex("#1F2937"));
+/// .background_color(SurfaceVariant);
 /// ```
 #[derive(Debug)]
 pub struct Tooltip {
     content: TooltipContent,
-    background: Srgb,
-    text_color: Srgb,
+    background: Color,
+    text_color: Color,
     corner_radius: f32,
     padding: f32,
 }
@@ -131,11 +134,11 @@ pub struct Tooltip {
 impl Tooltip {
     /// Creates a new tooltip with the given content.
     #[must_use]
-    pub const fn new(content: TooltipContent) -> Self {
+    pub fn new(content: TooltipContent) -> Self {
         Self {
             content,
-            background: Srgb::from_hex("#1F2937"),
-            text_color: Srgb::from_hex("#FFFFFF"),
+            background: Color::surface_variant(),
+            text_color: Color::foreground(),
             corner_radius: 4.0,
             padding: 8.0,
         }
@@ -143,15 +146,15 @@ impl Tooltip {
 
     /// Sets the tooltip fill color.
     #[must_use]
-    pub fn background_color(mut self, color: impl Into<Srgb>) -> Self {
-        self.background = color.into();
+    pub fn background_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.background = into_color(color);
         self
     }
 
     /// Sets the text color.
     #[must_use]
-    pub fn text_color(mut self, color: impl Into<Srgb>) -> Self {
-        self.text_color = color.into();
+    pub fn text_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.text_color = into_color(color);
         self
     }
 
@@ -171,11 +174,11 @@ impl Tooltip {
 }
 
 impl View for Tooltip {
-    fn body(self, _env: &waterui_core::Environment) -> impl View {
+    fn body(self, _env: &Environment) -> impl View {
         if self.content.is_empty() {
             AnyView::new(())
         } else {
-            let text_color = Color::from(self.text_color);
+            let text_color = self.text_color;
             let mut views: Vec<AnyView> = Vec::new();
 
             // Add title if present
@@ -185,7 +188,7 @@ impl View for Tooltip {
 
             // Add values with optional color indicators
             for val in &self.content.values {
-                let value_view = val.color.map_or_else(
+                let value_view = val.color.as_ref().map_or_else(
                     || {
                         AnyView::new(
                             (val.label.clone() + Text::verbatim(": ") + val.value.clone())
@@ -194,8 +197,7 @@ impl View for Tooltip {
                     },
                     |color| {
                         let indicator = Frame::new(
-                            RoundedRectangle::new(CornerRadius::fraction(0.5))
-                                .fill(Color::from(color)),
+                            RoundedRectangle::new(CornerRadius::fraction(0.5)).fill(color.clone()),
                         )
                         .width(8.0)
                         .height(8.0);
@@ -216,12 +218,11 @@ impl View for Tooltip {
                 EdgeInsets::all(self.padding),
                 Frame::new(VStack::new(HorizontalAlignment::Leading, 4.0, views)).min_width(80.0),
             );
-            let background =
-                RoundedRectangle::new(self.corner_radius).fill(Color::from(self.background));
+            let background = RoundedRectangle::new(self.corner_radius).fill(self.background);
 
             // Stack content over background
-            AnyView::new(Frame::new(waterui_layout::stack::ZStack::new(
-                waterui_layout::stack::Alignment::default(),
+            AnyView::new(Frame::new(ZStack::new(
+                Alignment::default(),
                 (background, content),
             )))
         }

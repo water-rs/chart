@@ -4,9 +4,9 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 
-use nami::{Binding, Signal};
+use nami::{Binding, Signal, signal::IntoComputed};
 use waterui_core::{Environment, View};
-use waterui_graphics::color::Srgb;
+use waterui_graphics::color::Color;
 
 use crate::charts::canvas::{
     interactive_cartesian_signal_canvas, point_bounds, point_geometry, record_scatter,
@@ -17,11 +17,12 @@ use crate::interaction::{
     CartesianSelectionBindings, CartesianViewportBindings, HitResult, SelectionBindings,
 };
 use crate::params::PositiveF32;
+use crate::theme_color::into_color;
 
 /// Scatter chart visualization.
 pub struct ScatterChart<S: Signal<Output = Vec<DataPoint>>> {
     data: S,
-    color: Srgb,
+    color: Color,
     radius: f32,
     selection: SelectionBindings<DataPoint>,
     cartesian_selection: CartesianSelectionBindings,
@@ -37,7 +38,7 @@ impl<S: Signal<Output = Vec<DataPoint>>> ScatterChart<S> {
     pub fn new(data: S) -> Self {
         Self {
             data,
-            color: Srgb::from_hex("#8B5CF6"),
+            color: Color::accent(),
             radius: 4.0,
             selection: SelectionBindings::default(),
             cartesian_selection: CartesianSelectionBindings::default(),
@@ -52,8 +53,8 @@ impl<S: Signal<Output = Vec<DataPoint>>> ScatterChart<S> {
 
     /// Sets the point color.
     #[must_use]
-    pub const fn color(mut self, color: Srgb) -> Self {
-        self.color = color;
+    pub fn color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.color = into_color(color);
         self
     }
 
@@ -84,14 +85,14 @@ impl<S: Signal<Output = Vec<DataPoint>>> ScatterChart<S> {
 
 impl<S: Signal<Output = Vec<DataPoint>> + Clone + 'static> View for ScatterChart<S> {
     fn body(self, env: &Environment) -> impl View {
-        let color = self.color;
+        let color = self.color.resolve(env);
         let radius = self.radius;
         interactive_cartesian_signal_canvas(
             env,
             self.data,
             |data: &Vec<DataPoint>| point_bounds(data),
             move |size, data, bounds| point_geometry(size, data, bounds, radius.max(8.0)),
-            move |cx, frame| record_scatter(cx, frame, color, radius),
+            move |cx, frame| record_scatter(cx, frame, &color, radius),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

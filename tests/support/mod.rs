@@ -8,6 +8,7 @@ use std::time::Duration;
 use waterui::accessibility::AccessibilityRole;
 use waterui::component::{text, vstack};
 use waterui::graphics::color::Srgb;
+use waterui::theme::color::{Accent, Error, Tertiary};
 use waterui::{Signal, SignalExt as _, View, ViewExt as _};
 use waterui_chart::{
     AreaData, AreaDatum, AreaSeries, BubblePoint, Candle, ChartAnchor, DataBounds, DataPoint,
@@ -96,18 +97,9 @@ pub fn depth_data() -> DepthData {
 
 pub fn area_data() -> AreaData {
     AreaData::new(vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
-        .series(
-            AreaSeries::new("North", vec![10.0, 14.0, 12.0, 18.0, 20.0, 22.0])
-                .color(0.23, 0.51, 0.96, 0.72),
-        )
-        .series(
-            AreaSeries::new("South", vec![6.0, 8.0, 9.0, 11.0, 12.0, 14.0])
-                .color(0.06, 0.72, 0.51, 0.64),
-        )
-        .series(
-            AreaSeries::new("West", vec![4.0, 5.0, 6.0, 7.0, 8.0, 9.0])
-                .color(0.98, 0.53, 0.12, 0.56),
-        )
+        .series(AreaSeries::new("North", vec![10.0, 14.0, 12.0, 18.0, 20.0, 22.0]).color(Accent))
+        .series(AreaSeries::new("South", vec![6.0, 8.0, 9.0, 11.0, 12.0, 14.0]).color(Tertiary))
+        .series(AreaSeries::new("West", vec![4.0, 5.0, 6.0, 7.0, 8.0, 9.0]).color(Error))
 }
 
 pub fn pie_data() -> Vec<DataPoint> {
@@ -351,7 +343,7 @@ pub fn bubble_hit_location(data: &[BubblePoint], index: usize) -> (f32, f32) {
         max_y = max_y.max(point.y);
     }
     let bounds = normalize_bounds(DataBounds::new(min_x, max_x, min_y, max_y).with_padding(0.1));
-    let point = data[index];
+    let point = &data[index];
     normalized_plot_point(bounds, point.x, point.y)
 }
 

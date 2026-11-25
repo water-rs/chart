@@ -5,14 +5,16 @@ use waterui_core::{Environment, View};
 
 use crate::charts::canvas::{contour_geometry, interactive_signal_canvas, record_contour};
 use crate::composition::ChartComposition;
-use crate::data::ContourData;
+use crate::data::{ColorScale, ContourData};
 use crate::interaction::{GridDatum, HitResult, SelectionBindings};
 use crate::params::PositiveF32;
+use crate::theme_color::resolve_color_scale;
 
 /// Contour chart for isoline visualization.
 pub struct ContourChart<S: Signal<Output = ContourData>> {
     data: S,
     line_width: f32,
+    color_scale: ColorScale,
     selection: SelectionBindings<GridDatum>,
     composition: ChartComposition<GridDatum>,
 }
@@ -26,6 +28,7 @@ impl<S: Signal<Output = ContourData>> ContourChart<S> {
         Self {
             data,
             line_width: 2.0,
+            color_scale: ColorScale::default(),
             selection: SelectionBindings::new(),
             composition: ChartComposition::default(),
         }
@@ -40,6 +43,13 @@ impl<S: Signal<Output = ContourData>> ContourChart<S> {
     #[must_use]
     pub fn line_width(mut self, width: impl Into<PositiveF32>) -> Self {
         self.line_width = width.into().get();
+        self
+    }
+
+    /// Sets the color scale used to map scalar levels to colors.
+    #[must_use]
+    pub fn color_scale(mut self, scale: ColorScale) -> Self {
+        self.color_scale = scale;
         self
     }
 
@@ -60,12 +70,13 @@ impl<S: Signal<Output = ContourData>> ContourChart<S> {
 
 impl<S: Signal<Output = ContourData> + Clone + 'static> View for ContourChart<S> {
     fn body(self, env: &Environment) -> impl View {
+        let color_scale = resolve_color_scale(&self.color_scale, env);
         let line_width = self.line_width;
         interactive_signal_canvas(
             env,
             self.data,
             contour_geometry,
-            move |cx, frame| record_contour(cx, frame, line_width),
+            move |cx, frame| record_contour(cx, frame, &color_scale, line_width),
             self.selection,
             self.composition,
         )

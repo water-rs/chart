@@ -4,9 +4,9 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 
-use nami::{Binding, Signal};
+use nami::{Binding, Signal, signal::IntoComputed};
 use waterui_core::{Environment, View};
-use waterui_graphics::color::Srgb;
+use waterui_graphics::color::Color;
 
 use crate::charts::canvas::{
     bar_bounds, bar_geometry, interactive_cartesian_signal_canvas, record_bar,
@@ -16,11 +16,12 @@ use crate::data::DataPoint;
 use crate::interaction::{
     CartesianSelectionBindings, CartesianViewportBindings, HitResult, SelectionBindings,
 };
+use crate::theme_color::into_color;
 
 /// Bar chart visualization.
 pub struct BarChart<S: Signal<Output = Vec<DataPoint>>> {
     data: S,
-    color: Srgb,
+    color: Color,
     selection: SelectionBindings<DataPoint>,
     cartesian_selection: CartesianSelectionBindings,
     cartesian_viewport: CartesianViewportBindings,
@@ -35,7 +36,7 @@ impl<S: Signal<Output = Vec<DataPoint>>> BarChart<S> {
     pub fn new(data: S) -> Self {
         Self {
             data,
-            color: Srgb::from_hex("#3B82F6"),
+            color: Color::accent(),
             selection: SelectionBindings::default(),
             cartesian_selection: CartesianSelectionBindings::default(),
             cartesian_viewport: CartesianViewportBindings::default(),
@@ -49,8 +50,8 @@ impl<S: Signal<Output = Vec<DataPoint>>> BarChart<S> {
 
     /// Sets the fill color used for all bars.
     #[must_use]
-    pub const fn color(mut self, color: Srgb) -> Self {
-        self.color = color;
+    pub fn color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.color = into_color(color);
         self
     }
 
@@ -71,13 +72,13 @@ impl<S: Signal<Output = Vec<DataPoint>>> BarChart<S> {
 
 impl<S: Signal<Output = Vec<DataPoint>> + Clone + 'static> View for BarChart<S> {
     fn body(self, env: &Environment) -> impl View {
-        let color = self.color;
+        let color = self.color.resolve(env);
         interactive_cartesian_signal_canvas(
             env,
             self.data,
             |data: &Vec<DataPoint>| bar_bounds(data),
             move |size, data, bounds| bar_geometry(size, data, bounds),
-            move |cx, frame| record_bar(cx, frame, color),
+            move |cx, frame| record_bar(cx, frame, &color),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

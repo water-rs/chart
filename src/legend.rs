@@ -4,13 +4,16 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 
-use waterui_core::{AnyView, View};
+use nami::signal::IntoComputed;
+use waterui_core::{AnyView, Environment, View};
 use waterui_graphics::color::Color;
 use waterui_layout::frame::Frame;
 use waterui_layout::stack::{HStack, HorizontalAlignment, VStack, VerticalAlignment};
 use waterui_layout::{PositionExt, UnitPoint, absolute};
 use waterui_shape::{Rectangle, ShapeExt};
 use waterui_text::{IntoText, Text};
+
+use crate::theme_color::into_color;
 
 /// A single item in the legend.
 #[derive(Debug, Clone)]
@@ -24,10 +27,10 @@ pub struct LegendItem {
 impl LegendItem {
     /// Creates a new legend item.
     #[must_use]
-    pub fn new(label: impl IntoText, color: impl Into<Color>) -> Self {
+    pub fn new(label: impl IntoText, color: impl IntoComputed<Color>) -> Self {
         Self {
             label: label.into_text(),
-            color: color.into(),
+            color: into_color(color),
         }
     }
 }
@@ -67,12 +70,12 @@ pub enum LegendOrientation {
 /// # Example
 ///
 /// ```rust
-/// use waterui::color::Srgb;
+/// use waterui::theme::color::{Accent, Error};
 /// use waterui_chart::{Legend, LegendItem, LegendPosition};
 ///
 /// Legend::new(vec![
-///     LegendItem::new("Sales", Srgb::from_hex("#3B82F6")),
-///     LegendItem::new("Revenue", Srgb::from_hex("#EF4444")),
+///     LegendItem::new("Sales", Accent),
+///     LegendItem::new("Revenue", Error),
 /// ])
 /// .position(LegendPosition::TopRight)
 /// .marker_size(12.0);
@@ -129,7 +132,7 @@ impl Legend {
 }
 
 impl View for Legend {
-    fn body(self, _env: &waterui_core::Environment) -> impl View {
+    fn body(self, _env: &Environment) -> impl View {
         let marker_size = self.marker_size;
         let spacing = self.spacing;
 

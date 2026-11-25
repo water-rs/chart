@@ -2,11 +2,13 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
+use alloc::{string::String, vec, vec::Vec};
 use core::num::NonZeroU32;
-use nami::impl_constant;
+use nami::{impl_constant, signal::IntoComputed};
 use num_traits::ToPrimitive as _;
-use waterui_graphics::color::Srgb;
+use waterui_graphics::color::{Color, Srgb};
+
+use crate::theme_color::{default_scale_stops, into_color};
 
 /// Error returned when chart data violates structural constraints.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -542,8 +544,7 @@ impl ContourData {
 }
 
 /// A bubble data point with position and size.
-#[derive(Debug, Clone, Copy, Default, PartialEq, bytemuck::Pod, bytemuck::Zeroable)]
-#[repr(C)]
+#[derive(Debug, Clone, Default)]
 pub struct BubblePoint {
     /// X coordinate.
     pub x: f32,
@@ -551,8 +552,14 @@ pub struct BubblePoint {
     pub y: f32,
     /// Bubble size (radius will be scaled proportionally).
     pub size: f32,
-    /// Color override (RGBA, or use default if alpha is 0).
-    pub color: [f32; 4],
+    /// Optional color override (uses the chart's color when `None`).
+    pub color: Option<Color>,
+}
+
+impl PartialEq for BubblePoint {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.size == other.size
+    }
 }
 
 impl BubblePoint {
@@ -563,89 +570,44 @@ impl BubblePoint {
             x,
             y,
             size,
-            color: [0.0, 0.0, 0.0, 0.0], // Use default color
+            color: None,
         }
     }
 
-    /// Creates a bubble point with a custom color.
+    /// Sets a custom color for this bubble point.
     #[must_use]
-    pub const fn with_color(
-        x_position: f32,
-        y_position: f32,
-        size: f32,
-        red: f32,
-        green: f32,
-        blue: f32,
-        alpha: f32,
-    ) -> Self {
-        Self {
-            x: x_position,
-            y: y_position,
-            size,
-            color: [red, green, blue, alpha],
-        }
+    pub fn color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.color = Some(into_color(color));
+        self
     }
-}
-
-/// Parse a hex byte from a slice at the given offset.
-fn parse_hex_byte(bytes: &[u8], offset: usize) -> u8 {
-    let hex_digit = |b: u8| -> u8 {
-        match b {
-            b'0'..=b'9' => b - b'0',
-            b'a'..=b'f' => b - b'a' + 10,
-            b'A'..=b'F' => b - b'A' + 10,
-            _ => 0,
-        }
-    };
-    (hex_digit(bytes[offset]) << 4) | hex_digit(bytes[offset + 1])
 }
 
 /// A single data series for radar charts.
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default)]
 pub struct RadarSeries {
     /// Series name for legend.
-    pub name: alloc::string::String,
+    pub name: String,
     /// Values for each axis (must match axis count).
     pub values: Vec<f32>,
-    /// Series color (RGBA).
-    pub color: [f32; 4],
+    /// Optional series color (uses the theme categorical palette when `None`).
+    pub color: Option<Color>,
 }
 
 impl RadarSeries {
     /// Creates a new radar series.
     #[must_use]
-    pub fn new(name: impl Into<alloc::string::String>, values: Vec<f32>) -> Self {
+    pub fn new(name: impl Into<String>, values: Vec<f32>) -> Self {
         Self {
             name: name.into(),
             values,
-            color: [0.23, 0.51, 0.96, 1.0], // Default blue
+            color: None,
         }
     }
 
     /// Sets the series color.
     #[must_use]
-    pub const fn color(mut self, r: f32, g: f32, b: f32, a: f32) -> Self {
-        self.color = [r, g, b, a];
-        self
-    }
-
-    /// Sets the series color from a hex string (e.g., "#3B82F6").
-    #[must_use]
-    pub fn color_hex(mut self, hex: &str) -> Self {
-        // Parse hex color directly
-        let bytes = hex.as_bytes();
-        let offset = usize::from(!bytes.is_empty() && bytes[0] == b'#');
-        if bytes.len() - offset >= 6 {
-            let r = parse_hex_byte(bytes, offset);
-            let g = parse_hex_byte(bytes, offset + 2);
-            let b = parse_hex_byte(bytes, offset + 4);
-            self.color = [
-                f32::from(r) / 255.0,
-                f32::from(g) / 255.0,
-                f32::from(b) / 255.0,
-                1.0,
-            ];
-        }
+    pub fn color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.color = Some(into_color(color));
         self
     }
 }
@@ -655,7 +617,7 @@ impl RadarSeries {
 /// Displays multivariate data on radial axes emanating from a center point.
 /// Each axis represents a variable, and data series form polygons connecting
 /// the values on each axis.
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default)]
 pub struct RadarData {
     /// Number of axes (dimensions).
     pub axis_count: u32,
@@ -825,7 +787,7 @@ impl GeoPolygon {
 ///
 /// Displays regions colored by data values using a color scale.
 /// Supports multiple polygons with tessellated geometry.
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default)]
 pub struct ChoroplethData {
     /// Geographic polygons to render.
     pub polygons: Vec<GeoPolygon>,
@@ -848,7 +810,7 @@ impl ChoroplethData {
             polygons,
             min_value,
             max_value,
-            color_scale: ColorScale::viridis(),
+            color_scale: ColorScale::default(),
         }
     }
 
@@ -898,33 +860,43 @@ impl ChoroplethData {
 }
 
 /// Color scale for continuous data mapping.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct ColorScale {
-    /// Color stops as (`value_ratio`, `srgb_color`) pairs.
+    /// Color stops as (`value_ratio`, `color`) pairs.
     /// `value_ratio` is 0.0 to 1.0 representing min to max.
-    pub stops: Vec<(f32, Srgb)>,
+    pub stops: Vec<(f32, Color)>,
 }
 
 impl Default for ColorScale {
     fn default() -> Self {
-        Self::viridis()
+        Self {
+            stops: default_scale_stops(),
+        }
     }
 }
 
 impl ColorScale {
     /// Creates a sequential color scale from one color to another.
     #[must_use]
-    pub fn sequential(from: Srgb, to: Srgb) -> Self {
+    pub fn sequential(from: impl IntoComputed<Color>, to: impl IntoComputed<Color>) -> Self {
         Self {
-            stops: vec![(0.0, from), (1.0, to)],
+            stops: vec![(0.0, into_color(from)), (1.0, into_color(to))],
         }
     }
 
     /// Creates a diverging color scale.
     #[must_use]
-    pub fn diverging(low: Srgb, mid: Srgb, high: Srgb) -> Self {
+    pub fn diverging(
+        low: impl IntoComputed<Color>,
+        mid: impl IntoComputed<Color>,
+        high: impl IntoComputed<Color>,
+    ) -> Self {
         Self {
-            stops: vec![(0.0, low), (0.5, mid), (1.0, high)],
+            stops: vec![
+                (0.0, into_color(low)),
+                (0.5, into_color(mid)),
+                (1.0, into_color(high)),
+            ],
         }
     }
 
@@ -933,11 +905,11 @@ impl ColorScale {
     pub fn viridis() -> Self {
         Self {
             stops: vec![
-                (0.0, Srgb::from_hex("#440154")),
-                (0.25, Srgb::from_hex("#3B528B")),
-                (0.5, Srgb::from_hex("#21918C")),
-                (0.75, Srgb::from_hex("#5EC962")),
-                (1.0, Srgb::from_hex("#FDE725")),
+                (0.0, Color::from(Srgb::from_hex("#440154"))),
+                (0.25, Color::from(Srgb::from_hex("#3B528B"))),
+                (0.5, Color::from(Srgb::from_hex("#21918C"))),
+                (0.75, Color::from(Srgb::from_hex("#5EC962"))),
+                (1.0, Color::from(Srgb::from_hex("#FDE725"))),
             ],
         }
     }
@@ -947,59 +919,40 @@ impl ColorScale {
     pub fn heat() -> Self {
         Self {
             stops: vec![
-                (0.0, Srgb::from_hex("#0000FF")),
-                (0.5, Srgb::from_hex("#FFFF00")),
-                (1.0, Srgb::from_hex("#FF0000")),
+                (0.0, Color::from(Srgb::from_hex("#0000FF"))),
+                (0.5, Color::from(Srgb::from_hex("#FFFF00"))),
+                (1.0, Color::from(Srgb::from_hex("#FF0000"))),
             ],
         }
     }
 }
 
 /// A single data series for stacked area charts.
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default)]
 pub struct AreaSeries {
     /// Series name for legend.
-    pub name: alloc::string::String,
+    pub name: String,
     /// Y values for each X position (must have same length across all series).
     pub values: Vec<f32>,
-    /// Series color (RGBA).
-    pub color: [f32; 4],
+    /// Optional series color (uses the theme categorical palette when `None`).
+    pub color: Option<Color>,
 }
 
 impl AreaSeries {
     /// Creates a new area series.
     #[must_use]
-    pub fn new(name: impl Into<alloc::string::String>, values: Vec<f32>) -> Self {
+    pub fn new(name: impl Into<String>, values: Vec<f32>) -> Self {
         Self {
             name: name.into(),
             values,
-            color: [0.23, 0.51, 0.96, 0.7], // Default blue with alpha
+            color: None,
         }
     }
 
     /// Sets the series color.
     #[must_use]
-    pub const fn color(mut self, r: f32, g: f32, b: f32, a: f32) -> Self {
-        self.color = [r, g, b, a];
-        self
-    }
-
-    /// Sets the series color from a hex string (e.g., "#3B82F6").
-    #[must_use]
-    pub fn color_hex(mut self, hex: &str) -> Self {
-        let bytes = hex.as_bytes();
-        let offset = usize::from(!bytes.is_empty() && bytes[0] == b'#');
-        if bytes.len() - offset >= 6 {
-            let r = parse_hex_byte(bytes, offset);
-            let g = parse_hex_byte(bytes, offset + 2);
-            let b = parse_hex_byte(bytes, offset + 4);
-            self.color = [
-                f32::from(r) / 255.0,
-                f32::from(g) / 255.0,
-                f32::from(b) / 255.0,
-                0.7,
-            ];
-        }
+    pub fn color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.color = Some(into_color(color));
         self
     }
 }
@@ -1008,7 +961,7 @@ impl AreaSeries {
 ///
 /// Contains multiple data series that stack on top of each other.
 /// All series must have the same number of data points.
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default)]
 pub struct AreaData {
     /// X values shared by all series.
     pub x_values: Vec<f32>,
@@ -1192,41 +1145,30 @@ impl DataBounds {
 }
 
 /// Gauge region for colored threshold zones.
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct GaugeRegion {
     /// Threshold value (region applies up to this value).
     pub threshold: f32,
-    /// Region color (RGBA).
-    pub color: [f32; 4],
+    /// Region color.
+    pub color: Color,
+}
+
+impl Default for GaugeRegion {
+    fn default() -> Self {
+        Self {
+            threshold: 0.0,
+            color: Color::accent(),
+        }
+    }
 }
 
 impl GaugeRegion {
     /// Creates a new gauge region.
     #[must_use]
-    pub const fn new(threshold: f32, r: f32, g: f32, b: f32, a: f32) -> Self {
+    pub fn new(threshold: f32, color: impl IntoComputed<Color>) -> Self {
         Self {
             threshold,
-            color: [r, g, b, a],
-        }
-    }
-
-    /// Creates a region from a hex color.
-    #[must_use]
-    pub fn hex(threshold: f32, hex: &str) -> Self {
-        let bytes = hex.as_bytes();
-        let offset = usize::from(!bytes.is_empty() && bytes[0] == b'#');
-        let (r, g, b) = if bytes.len() - offset >= 6 {
-            (
-                f32::from(parse_hex_byte(bytes, offset)) / 255.0,
-                f32::from(parse_hex_byte(bytes, offset + 2)) / 255.0,
-                f32::from(parse_hex_byte(bytes, offset + 4)) / 255.0,
-            )
-        } else {
-            (0.5, 0.5, 0.5)
-        };
-        Self {
-            threshold,
-            color: [r, g, b, 1.0],
+            color: into_color(color),
         }
     }
 }
@@ -1235,7 +1177,7 @@ impl GaugeRegion {
 ///
 /// Displays a single value within a range using a circular arc gauge.
 /// Supports colored threshold regions and an optional needle indicator.
-#[derive(Debug, Clone, Default, PartialEq)]
+#[derive(Debug, Clone, Default)]
 pub struct GaugeData {
     /// Current gauge value.
     pub value: f32,

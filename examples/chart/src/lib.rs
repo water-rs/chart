@@ -1,12 +1,15 @@
 //! Chart example demonstrating all chart types.
 
 use waterui::app::{App, Windows};
-use waterui::color::Srgb;
 use waterui::layout::grid::{grid as layout_grid, row};
 use waterui::prelude::*;
 use waterui::preview;
 use waterui::reactive::{binding, impl_constant, Binding};
 use waterui::text::font::FontWeight;
+use waterui::theme::color::{
+    Accent, AccentContainer, Background, Error, Foreground, MutedForeground, SurfaceVariant,
+    Tertiary, TertiaryContainer,
+};
 use waterui_chart::{
     ArcAngles, AreaChart, AreaData, AreaSeries, AxisConfig, BarChart, BubbleChart, BubblePoint,
     Candle, CandlestickChart, ChartExt, ContourChart, ContourData, DataBounds, DataPoint,
@@ -150,12 +153,12 @@ pub fn demo() -> impl View {
     let mode = binding(ChartMode::default());
 
     zstack((
-        Color::srgb_hex("#1a1a2e"),
+        Background,
         vstack((
             text("Charts Demo")
                 .title()
                 .weight(FontWeight::Bold)
-                .foreground(Srgb::WHITE),
+                .foreground(Foreground),
             mode_controls(&mode),
             spacer(),
             chart_layers(&mode),
@@ -178,7 +181,7 @@ fn bar_chart_preview() -> impl View {
     let bounds = DataBounds::from_points(&bar_points);
     let bar_data = binding(bar_points);
     BarChart::new(bar_data)
-        .color(Srgb::from_hex("#3B82F6"))
+        .color(Accent)
         .axes(bounds)
         .y_axis(AxisConfig::new().tick_count(5).show_grid().label("Sales"))
         .x_axis(AxisConfig::new().tick_count(6).label("Month"))
@@ -199,7 +202,7 @@ fn line_chart_preview() -> impl View {
     let bounds = DataBounds::from_points(&line_points);
     let line_data = binding(line_points);
     LineChart::new(line_data)
-        .color(Srgb::from_hex("#22C55E"))
+        .color(Tertiary)
         .line_width(3.0)
         .axes(bounds)
         .y_axis(AxisConfig::new().tick_count(5))
@@ -236,7 +239,7 @@ fn scatter_chart_preview() -> impl View {
     let bounds = DataBounds::from_points(&scatter_points);
     let scatter_data = binding(scatter_points);
     ScatterChart::new(scatter_data)
-        .color(Srgb::from_hex("#EF4444"))
+        .color(Error)
         .radius(6.0)
         .axes(bounds)
         .size(350.0, 280.0)
@@ -254,8 +257,8 @@ fn candlestick_chart_preview() -> impl View {
     ];
     let candles = binding(candle_data);
     CandlestickChart::new(candles)
-        .bullish_color(Srgb::from_hex("#22C55E"))
-        .bearish_color(Srgb::from_hex("#EF4444"))
+        .bullish_color(Accent)
+        .bearish_color(Error)
         .size(350.0, 280.0)
 }
 
@@ -279,8 +282,8 @@ fn depth_chart_preview() -> impl View {
     );
     let depth = binding(depth_data);
     DepthChart::new(depth)
-        .bid_color(Srgb::from_hex("#22C55E"))
-        .ask_color(Srgb::from_hex("#EF4444"))
+        .bid_color(Accent)
+        .ask_color(Error)
         .size(350.0, 280.0)
 }
 
@@ -320,9 +323,9 @@ fn scatter_stress_preview() -> impl View {
     vstack((
         text("10,000 Points @ 120fps")
             .caption()
-            .foreground(Srgb::WHITE),
+            .foreground(Foreground),
         ScatterChart::new(scatter_data)
-            .color(Srgb::from_hex("#8B5CF6"))
+            .color(Tertiary)
             .radius(2.0)
             .axes(bounds)
             .size(350.0, 280.0),
@@ -347,9 +350,9 @@ fn line_stress_preview() -> impl View {
     vstack((
         text("1,000 Points @ 120fps")
             .caption()
-            .foreground(Srgb::WHITE),
+            .foreground(Foreground),
         LineChart::new(line_data)
-            .color(Srgb::from_hex("#06B6D4"))
+            .color(Accent)
             .line_width(1.5)
             .axes(bounds)
             .size(350.0, 280.0),
@@ -382,7 +385,7 @@ fn heatmap_stress_preview() -> impl View {
     vstack((
         text("10,000 Cells @ 120fps")
             .caption()
-            .foreground(Srgb::WHITE),
+            .foreground(Foreground),
         HeatmapChart::new(heatmap).size(300.0, 300.0),
     ))
 }
@@ -414,18 +417,9 @@ fn contour_chart_preview() -> impl View {
 fn radar_chart_preview() -> impl View {
     let radar_data = RadarData::new(6)
         .labels(vec!["Speed", "Power", "Range", "Defense", "Magic", "Luck"])
-        .series(
-            RadarSeries::new("Warrior", vec![70.0, 95.0, 40.0, 90.0, 20.0, 50.0])
-                .color(0.23, 0.51, 0.96, 1.0),
-        )
-        .series(
-            RadarSeries::new("Mage", vec![50.0, 30.0, 80.0, 40.0, 95.0, 60.0])
-                .color(0.58, 0.29, 0.89, 1.0),
-        )
-        .series(
-            RadarSeries::new("Rogue", vec![95.0, 60.0, 50.0, 30.0, 40.0, 85.0])
-                .color(0.16, 0.82, 0.49, 1.0),
-        )
+        .series(RadarSeries::new("Warrior", vec![70.0, 95.0, 40.0, 90.0, 20.0, 50.0]).color(Accent))
+        .series(RadarSeries::new("Mage", vec![50.0, 30.0, 80.0, 40.0, 95.0, 60.0]).color(Tertiary))
+        .series(RadarSeries::new("Rogue", vec![95.0, 60.0, 50.0, 30.0, 40.0, 85.0]).color(Error))
         .max_value(100.0);
     let radar = binding(radar_data);
     RadarChart::new(radar)
@@ -438,14 +432,14 @@ fn radar_chart_preview() -> impl View {
 #[preview]
 fn bubble_chart_preview() -> impl View {
     let bubble_data = vec![
-        BubblePoint::with_color(14.0, 1.4, 100.0, 0.94, 0.27, 0.27, 0.7),
-        BubblePoint::with_color(21.0, 0.33, 80.0, 0.23, 0.51, 0.96, 0.7),
-        BubblePoint::with_color(3.0, 1.38, 50.0, 0.16, 0.82, 0.49, 0.7),
-        BubblePoint::with_color(4.0, 0.13, 40.0, 0.98, 0.76, 0.18, 0.7),
-        BubblePoint::with_color(4.0, 0.08, 35.0, 0.58, 0.29, 0.89, 0.7),
-        BubblePoint::with_color(2.8, 0.07, 30.0, 0.96, 0.49, 0.13, 0.7),
-        BubblePoint::with_color(2.7, 0.07, 28.0, 0.13, 0.69, 0.76, 0.7),
-        BubblePoint::with_color(2.0, 0.21, 45.0, 0.45, 0.78, 0.24, 0.7),
+        BubblePoint::new(14.0, 1.4, 100.0).color(Error),
+        BubblePoint::new(21.0, 0.33, 80.0).color(Accent),
+        BubblePoint::new(3.0, 1.38, 50.0).color(Tertiary),
+        BubblePoint::new(4.0, 0.13, 40.0).color(AccentContainer),
+        BubblePoint::new(4.0, 0.08, 35.0).color(TertiaryContainer),
+        BubblePoint::new(2.8, 0.07, 30.0).color(MutedForeground),
+        BubblePoint::new(2.7, 0.07, 28.0).color(Accent),
+        BubblePoint::new(2.0, 0.21, 45.0).color(Tertiary),
     ];
     let bubbles = binding(bubble_data);
     BubbleChart::new(bubbles)
@@ -458,17 +452,12 @@ fn bubble_chart_preview() -> impl View {
 #[preview]
 fn area_chart_preview() -> impl View {
     let area_data = AreaData::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+        .series(AreaSeries::new("Products", vec![30.0, 45.0, 35.0, 50.0, 60.0, 55.0]).color(Accent))
         .series(
-            AreaSeries::new("Products", vec![30.0, 45.0, 35.0, 50.0, 60.0, 55.0])
-                .color(0.23, 0.51, 0.96, 0.7),
+            AreaSeries::new("Services", vec![20.0, 25.0, 30.0, 35.0, 40.0, 45.0]).color(Tertiary),
         )
         .series(
-            AreaSeries::new("Services", vec![20.0, 25.0, 30.0, 35.0, 40.0, 45.0])
-                .color(0.16, 0.82, 0.49, 0.7),
-        )
-        .series(
-            AreaSeries::new("Subscriptions", vec![10.0, 15.0, 20.0, 25.0, 30.0, 35.0])
-                .color(0.58, 0.29, 0.89, 0.7),
+            AreaSeries::new("Subscriptions", vec![10.0, 15.0, 20.0, 25.0, 30.0, 35.0]).color(Error),
         )
         .stacked(true);
     let areas = binding(area_data);
@@ -478,16 +467,16 @@ fn area_chart_preview() -> impl View {
 #[preview]
 fn gauge_chart_preview() -> impl View {
     let gauge_data = GaugeData::new(72.0, 0.0, 100.0)
-        .region(GaugeRegion::hex(30.0, "#22C55E"))
-        .region(GaugeRegion::hex(70.0, "#EAB308"))
-        .region(GaugeRegion::hex(100.0, "#EF4444"))
+        .region(GaugeRegion::new(30.0, Accent))
+        .region(GaugeRegion::new(70.0, Tertiary))
+        .region(GaugeRegion::new(100.0, Error))
         .show_needle(true);
     let gauge = binding(gauge_data);
     GaugeChart::new(gauge)
         .arc(ArcAngles::from_degrees(-135.0, 135.0))
         .radii(GaugeRadii::new(0.3, 0.45))
-        .background_color(Srgb::from_hex("#333333"))
-        .needle_color(Srgb::from_hex("#FFFFFF"))
+        .background_color(SurfaceVariant)
+        .needle_color(Foreground)
         .size(300.0, 300.0)
 }
 

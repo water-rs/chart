@@ -291,7 +291,7 @@ fn scatter_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
 fn bubble_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
     let data = bubble_series();
     let index = 11;
-    let expected = data[index];
+    let expected = data[index].clone();
     assert_chart_semantic_flow(
         ui,
         "bubble",

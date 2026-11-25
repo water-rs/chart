@@ -1,8 +1,8 @@
 //! Candlestick chart component.
 
-use nami::{Binding, Signal};
+use nami::{Binding, Signal, signal::IntoComputed};
 use waterui_core::{Environment, View};
-use waterui_graphics::color::Srgb;
+use waterui_graphics::color::Color;
 
 use crate::charts::canvas::{
     candlestick_bounds, candlestick_geometry, interactive_cartesian_signal_canvas,
@@ -13,12 +13,13 @@ use crate::data::Candle;
 use crate::interaction::{
     CartesianSelectionBindings, CartesianViewportBindings, HitResult, SelectionBindings,
 };
+use crate::theme_color::into_color;
 
 /// Candlestick chart for financial OHLC data.
 pub struct CandlestickChart<S: Signal<Output = Vec<Candle>>> {
     data: S,
-    bullish_color: Srgb,
-    bearish_color: Srgb,
+    bullish_color: Color,
+    bearish_color: Color,
     selection: SelectionBindings<Candle>,
     cartesian_selection: CartesianSelectionBindings,
     cartesian_viewport: CartesianViewportBindings,
@@ -33,8 +34,8 @@ impl<S: Signal<Output = Vec<Candle>>> CandlestickChart<S> {
     pub fn new(data: S) -> Self {
         Self {
             data,
-            bullish_color: Srgb::from_hex("#22C55E"),
-            bearish_color: Srgb::from_hex("#EF4444"),
+            bullish_color: Color::accent(),
+            bearish_color: Color::error(),
             selection: SelectionBindings::default(),
             cartesian_selection: CartesianSelectionBindings::default(),
             cartesian_viewport: CartesianViewportBindings::default(),
@@ -48,15 +49,15 @@ impl<S: Signal<Output = Vec<Candle>>> CandlestickChart<S> {
 
     /// Sets the color used for bullish candles.
     #[must_use]
-    pub const fn bullish_color(mut self, color: Srgb) -> Self {
-        self.bullish_color = color;
+    pub fn bullish_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.bullish_color = into_color(color);
         self
     }
 
     /// Sets the color used for bearish candles.
     #[must_use]
-    pub const fn bearish_color(mut self, color: Srgb) -> Self {
-        self.bearish_color = color;
+    pub fn bearish_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.bearish_color = into_color(color);
         self
     }
 
@@ -77,14 +78,14 @@ impl<S: Signal<Output = Vec<Candle>>> CandlestickChart<S> {
 
 impl<S: Signal<Output = Vec<Candle>> + Clone + 'static> View for CandlestickChart<S> {
     fn body(self, env: &Environment) -> impl View {
-        let bullish_color = self.bullish_color;
-        let bearish_color = self.bearish_color;
+        let bullish_color = self.bullish_color.resolve(env);
+        let bearish_color = self.bearish_color.resolve(env);
         interactive_cartesian_signal_canvas(
             env,
             self.data,
             |data: &Vec<Candle>| candlestick_bounds(data),
             move |size, data, bounds| candlestick_geometry(size, data, bounds),
-            move |cx, frame| record_candlestick(cx, frame, bullish_color, bearish_color),
+            move |cx, frame| record_candlestick(cx, frame, &bullish_color, &bearish_color),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,
