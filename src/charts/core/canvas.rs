@@ -22,7 +22,7 @@ use waterui_core::{
     layout::{Point, Size},
 };
 use waterui_graphics::canvas::{Canvas, CanvasSize, Cx, Layer};
-use waterui_interaction::event::{Event, HoverEvent, OnEvent};
+use waterui_interaction::event::{HoverEvent, OnEvent};
 use waterui_interaction::gesture::{
     DragEvent, DragGesture, GestureObserver, GesturePhase, TapEvent, TapGesture,
 };
@@ -587,7 +587,7 @@ where
 {
     let canvas = Metadata::new(
         canvas,
-        OnEvent::new(Event::HoverMove, {
+        OnEvent::hover_move({
             let frame = frame.clone();
             let selection = selection.clone();
             move |hover: HoverEvent| {
@@ -601,7 +601,7 @@ where
     );
     Metadata::new(
         canvas,
-        OnEvent::new(Event::HoverExit, {
+        OnEvent::hover_exit({
             let selection = selection.clone();
             move || selection.clear_focus()
         }),
