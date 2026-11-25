@@ -433,13 +433,17 @@ fn axis_titles(y_label: Option<Text>, x_label: Option<Text>) -> impl View {
             label
                 .font_size(12.0)
                 .weight(FontWeight::Bold)
-                .position_in_offset(UnitPoint::TOP_LEADING, UnitPoint::TOP_LEADING, 2.0, 2.0)
+                .position_in(UnitPoint::TOP_LEADING)
+                .anchor(UnitPoint::TOP_LEADING)
+                .offset(2.0, 2.0)
         }),
         x_label.map(|label| {
             label
                 .font_size(12.0)
                 .weight(FontWeight::Bold)
-                .position_in_offset(UnitPoint::BOTTOM, UnitPoint::BOTTOM, 0.0, -2.0)
+                .position_in(UnitPoint::BOTTOM)
+                .anchor(UnitPoint::BOTTOM)
+                .offset(0.0, -2.0)
         }),
     ))
 }

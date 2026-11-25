@@ -67,11 +67,12 @@ fn chart_background_uses_plot_area_proxy_in_accessibility_tree(ui: UiBuilder) {
             "composition-background",
             LineChart::new(Binding::container(data.clone()))
                 .chart_background(|proxy| {
-                    absolute((overlay_badge("Plot area marker").position_anchor(
-                        UnitPoint::TOP_LEADING,
-                        proxy.plot_area_frame().map(|frame| frame.x + 6.0),
-                        proxy.plot_area_frame().map(|frame| frame.y + 6.0),
-                    ),))
+                    absolute((overlay_badge("Plot area marker")
+                        .position(
+                            proxy.plot_area_frame().map(|frame| frame.x + 6.0),
+                            proxy.plot_area_frame().map(|frame| frame.y + 6.0),
+                        )
+                        .anchor(UnitPoint::TOP_LEADING),))
                 })
                 .size(CHART_WIDTH, CHART_HEIGHT),
         )
@@ -91,11 +92,9 @@ fn chart_overlay_static_layer_exposes_accessibility_node(ui: UiBuilder) {
         chart_surface(
             "composition-overlay",
             LineChart::new(Binding::container(data.clone())).chart_overlay(|_proxy| {
-                absolute((overlay_badge("Static overlay").position_anchor(
-                    UnitPoint::TOP_LEADING,
-                    24.0,
-                    24.0,
-                ),))
+                absolute((overlay_badge("Static overlay")
+                    .position(24.0, 24.0)
+                    .anchor(UnitPoint::TOP_LEADING),))
             }),
         )
         .background(Srgb::BLACK)
@@ -123,7 +122,8 @@ fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(ui: UiBuild
             LineChart::new(Binding::container(data.clone())).chart_overlay(move |proxy| {
                 let visible = selected_visibility(proxy.clone());
                 absolute((overlay_badge("Proxy selection overlay")
-                    .position_anchor(UnitPoint::TOP_LEADING, 24.0, 24.0)
+                    .position(24.0, 24.0)
+                    .anchor(UnitPoint::TOP_LEADING)
                     .a11y_state(hidden_accessibility_state(visible))
                     .on_change(&proxy.selected(), {
                         let proxy_selected_binding = proxy_selected_binding.clone();
@@ -171,7 +171,8 @@ fn chart_overlay_reacts_to_proxy_selection_with_external_binding(ui: UiBuilder) 
                 .chart_overlay(|proxy| {
                     let visible = selected_visibility(proxy);
                     absolute((overlay_badge("External selection overlay")
-                        .position_anchor(UnitPoint::TOP_LEADING, 24.0, 24.0)
+                        .position(24.0, 24.0)
+                        .anchor(UnitPoint::TOP_LEADING)
                         .a11y_state(hidden_accessibility_state(visible)),))
                 }),
         )
@@ -207,7 +208,8 @@ fn chart_overlay_reactive_layer_is_initially_hidden_without_selection(ui: UiBuil
             LineChart::new(Binding::container(data.clone())).chart_overlay(|proxy| {
                 let visible = selected_visibility(proxy);
                 absolute((overlay_badge("Hidden overlay")
-                    .position_anchor(UnitPoint::TOP_LEADING, 24.0, 24.0)
+                    .position(24.0, 24.0)
+                    .anchor(UnitPoint::TOP_LEADING)
                     .a11y_state(hidden_accessibility_state(visible)),))
             }),
         )
@@ -253,7 +255,8 @@ fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder) {
                             .foreground(Srgb::WHITE)
                             .padding_with(6.0)
                             .background(Srgb::new(0.12, 0.18, 0.32))
-                            .position_anchor(UnitPoint::TOP_LEADING, 24.0, 24.0)
+                            .position(24.0, 24.0)
+                            .anchor(UnitPoint::TOP_LEADING)
                             .a11y_state(hidden_accessibility_state(visible)),))
                     }
                 }),

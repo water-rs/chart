@@ -287,10 +287,9 @@ where
         let max_width = chart_frame.map(|frame| (frame.width * TOOLTIP_MAX_WIDTH_RATIO).max(96.0));
         let content = Dynamic::watch(hit, move |hit| hit.map_or_else(|| AnyView::new(()), &build));
 
-        absolute((Frame::new(content).max_width(max_width).position_anchor(
-            UnitPoint::BOTTOM_LEADING,
-            x,
-            y,
-        ),))
+        absolute((Frame::new(content)
+            .max_width(max_width)
+            .position(x, y)
+            .anchor(UnitPoint::BOTTOM_LEADING),))
     }
 }

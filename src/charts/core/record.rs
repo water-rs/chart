@@ -13,7 +13,7 @@ use core::{f32::consts::TAU, iter};
 
 use nami::{Computed, SignalExt as _};
 use waterui_core::{
-    Environment,
+    Angle, Environment,
     layout::{Point, Rect, Size},
 };
 use waterui_graphics::{
@@ -540,13 +540,16 @@ fn slice_path(center: Point, inner_r: f32, outer_r: f32, start: f32, end: f32) -
     let builder = Path::builder().move_to(polar(center, outer_r, start)).arc(
         center,
         (outer_r, outer_r),
-        start,
-        sweep,
+        Angle::radians(start),
+        Angle::radians(sweep),
     );
     if inner_r > 0.0 {
-        builder
-            .line_to(polar(center, inner_r, end))
-            .arc(center, (inner_r, inner_r), end, -sweep)
+        builder.line_to(polar(center, inner_r, end)).arc(
+            center,
+            (inner_r, inner_r),
+            Angle::radians(end),
+            Angle::radians(-sweep),
+        )
     } else {
         builder.line_to(center)
     }
@@ -633,7 +636,12 @@ fn gauge_arcs(
     let ring_r = width.mul_add(0.5, inner_r);
     let arc = |from: f32, to: f32, color: WorkingColor| RingArc {
         path: Path::builder()
-            .arc(center, (ring_r, ring_r), from, to - from)
+            .arc(
+                center,
+                (ring_r, ring_r),
+                Angle::radians(from),
+                Angle::radians(to - from),
+            )
             .build(),
         width,
         color,

@@ -184,6 +184,9 @@ impl View for Legend {
             LegendPosition::Bottom => (UnitPoint::BOTTOM, UnitPoint::BOTTOM, 0.0, -inset),
         };
 
-        absolute((content.position_in_offset(anchor, position, offset_x, offset_y),))
+        absolute((content
+            .position_in(position)
+            .anchor(anchor)
+            .offset(offset_x, offset_y),))
     }
 }
