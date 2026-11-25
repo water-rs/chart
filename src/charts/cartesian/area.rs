@@ -57,12 +57,13 @@ impl<S: Signal<Output = AreaData>> AreaChart<S> {
 
 impl<S: Signal<Output = AreaData> + Clone + 'static> View for AreaChart<S> {
     fn body(self, env: &Environment) -> impl View {
+        let draw_env = env.clone();
         interactive_cartesian_signal_canvas(
             env,
             self.data,
             area_bounds,
             area_geometry,
-            record_area,
+            move |cx, frame| record_area(cx, frame, &draw_env),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

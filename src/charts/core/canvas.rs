@@ -123,7 +123,7 @@ pub(crate) fn interactive_cartesian_signal_canvas<S, D, T, B, G, F>(
 where
     S: Signal<Output = D> + 'static,
     S::Guard: 'static,
-    D: Clone + PartialEq + 'static,
+    D: Clone + 'static,
     T: Clone + PartialEq + 'static,
     B: Fn(&D) -> DataBounds + Clone + 'static,
     G: Fn(Size, &D, DataBounds) -> CartesianGeometry<T> + Clone + 'static,
@@ -409,7 +409,7 @@ pub(crate) fn interactive_signal_canvas<S, D, G, T, B, F>(
 where
     S: Signal<Output = D> + 'static,
     S::Guard: 'static,
-    D: Clone + PartialEq + 'static,
+    D: Clone + 'static,
     G: HitGeometry<T>,
     T: Clone + PartialEq + 'static,
     B: Fn(Size, &D) -> G + Clone + 'static,

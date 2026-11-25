@@ -4,20 +4,21 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 
-use nami::{Binding, Signal};
+use nami::{Binding, Signal, signal::IntoComputed};
 use waterui_core::{Environment, View};
-use waterui_graphics::color::Srgb;
+use waterui_graphics::color::Color;
 
 use crate::charts::canvas::{interactive_signal_canvas, pie_geometry, record_pie};
 use crate::composition::ChartComposition;
 use crate::data::DataPoint;
 use crate::interaction::{HitResult, SelectionBindings, SliceDatum};
 use crate::params::DonutInnerRadius;
+use crate::theme_color::{into_color, resolve_categorical_palette, resolve_colors};
 
 /// Pie chart visualization.
 pub struct PieChart<S: Signal<Output = Vec<DataPoint>>> {
     data: S,
-    colors: Vec<Srgb>,
+    colors: Vec<Color>,
     inner_radius: f32,
     selection: SelectionBindings<SliceDatum>,
     composition: ChartComposition<SliceDatum>,
@@ -42,8 +43,8 @@ impl<S: Signal<Output = Vec<DataPoint>>> PieChart<S> {
 
     /// Sets the slice color palette.
     #[must_use]
-    pub fn colors(mut self, colors: Vec<Srgb>) -> Self {
-        self.colors = colors;
+    pub fn colors<C: IntoComputed<Color>>(mut self, colors: impl IntoIterator<Item = C>) -> Self {
+        self.colors = colors.into_iter().map(into_color).collect();
         self
     }
 
@@ -81,13 +82,14 @@ impl<S: Signal<Output = Vec<DataPoint>>> PieChart<S> {
 
 impl<S: Signal<Output = Vec<DataPoint>> + Clone + 'static> View for PieChart<S> {
     fn body(self, env: &Environment) -> impl View {
-        let colors = self.colors;
+        let colors = resolve_colors(&self.colors, env);
+        let defaults = resolve_categorical_palette(env);
         let inner_radius = self.inner_radius;
         interactive_signal_canvas(
             env,
             self.data,
             move |size, data| pie_geometry(size, data, inner_radius),
-            move |cx, frame| record_pie(cx, frame, colors.clone(), inner_radius),
+            move |cx, frame| record_pie(cx, frame, &colors, &defaults, inner_radius),
             self.selection,
             self.composition,
         )

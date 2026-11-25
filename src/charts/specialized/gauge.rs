@@ -2,15 +2,16 @@
 
 use core::f32::consts::PI;
 
-use nami::{Binding, Signal};
+use nami::{Binding, Signal, signal::IntoComputed};
 use waterui_core::{Environment, View};
-use waterui_graphics::color::Srgb;
+use waterui_graphics::color::Color;
 
 use crate::charts::canvas::{gauge_geometry, interactive_signal_canvas, record_gauge};
 use crate::composition::ChartComposition;
 use crate::data::GaugeData;
 use crate::interaction::{HitResult, SelectionBindings, SliceDatum};
 use crate::params::{ArcAngles, GaugeRadii};
+use crate::theme_color::into_color;
 
 /// Gauge chart for speedometer-style value visualization.
 pub struct GaugeChart<S: Signal<Output = GaugeData>> {
@@ -19,9 +20,9 @@ pub struct GaugeChart<S: Signal<Output = GaugeData>> {
     end_angle: f32,
     inner_radius: f32,
     outer_radius: f32,
-    background_color: Srgb,
-    value_color: Srgb,
-    needle_color: Srgb,
+    background_color: Color,
+    value_color: Color,
+    needle_color: Color,
     selection: SelectionBindings<SliceDatum>,
     composition: ChartComposition<SliceDatum>,
 }
@@ -38,9 +39,9 @@ impl<S: Signal<Output = GaugeData>> GaugeChart<S> {
             end_angle: PI * 0.75,
             inner_radius: 0.3,
             outer_radius: 0.45,
-            background_color: Srgb::new(0.2, 0.2, 0.2),
-            value_color: Srgb::new(0.23, 0.51, 0.96),
-            needle_color: Srgb::new(0.9, 0.9, 0.9),
+            background_color: Color::surface_variant(),
+            value_color: Color::accent(),
+            needle_color: Color::foreground(),
             selection: SelectionBindings::new(),
             composition: ChartComposition::default(),
         }
@@ -78,22 +79,22 @@ impl<S: Signal<Output = GaugeData>> GaugeChart<S> {
 
     /// Sets the background arc color.
     #[must_use]
-    pub const fn background_color(mut self, color: Srgb) -> Self {
-        self.background_color = color;
+    pub fn background_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.background_color = into_color(color);
         self
     }
 
     /// Sets the active value arc color.
     #[must_use]
-    pub const fn value_color(mut self, color: Srgb) -> Self {
-        self.value_color = color;
+    pub fn value_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.value_color = into_color(color);
         self
     }
 
     /// Sets the needle color.
     #[must_use]
-    pub const fn needle_color(mut self, color: Srgb) -> Self {
-        self.needle_color = color;
+    pub fn needle_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.needle_color = into_color(color);
         self
     }
 
@@ -118,9 +119,10 @@ impl<S: Signal<Output = GaugeData> + Clone + 'static> View for GaugeChart<S> {
         let end_angle = self.end_angle;
         let inner_radius = self.inner_radius;
         let outer_radius = self.outer_radius;
-        let background_color = self.background_color;
-        let value_color = self.value_color;
-        let needle_color = self.needle_color;
+        let draw_env = env.clone();
+        let background_color = self.background_color.resolve(env);
+        let value_color = self.value_color.resolve(env);
+        let needle_color = self.needle_color.resolve(env);
         interactive_signal_canvas(
             env,
             self.data,
@@ -138,13 +140,14 @@ impl<S: Signal<Output = GaugeData> + Clone + 'static> View for GaugeChart<S> {
                 record_gauge(
                     cx,
                     frame,
+                    &draw_env,
                     start_angle,
                     end_angle,
                     inner_radius,
                     outer_radius,
-                    background_color,
-                    value_color,
-                    needle_color,
+                    &background_color,
+                    &value_color,
+                    &needle_color,
                 );
             },
             self.selection,

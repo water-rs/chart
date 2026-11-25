@@ -8,14 +8,17 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
-use core::f32::consts::TAU;
+use alloc::{vec, vec::Vec};
+use core::{f32::consts::TAU, iter};
 
 use nami::{Computed, SignalExt as _};
-use waterui_core::layout::{Point, Rect, Size};
+use waterui_core::{
+    Environment,
+    layout::{Point, Rect, Size},
+};
 use waterui_graphics::{
     canvas::{Circle, Cx, Line, Path, StrokeStyle},
-    color::{Srgb, WorkingColor},
+    color::{Color, WorkingColor},
 };
 
 use super::{
@@ -29,29 +32,14 @@ use super::{
 };
 use crate::{
     data::{
-        AreaData, BubblePoint, Candle, ChoroplethData, ColorScale, ContourData, DataPoint,
-        DepthData, GaugeData, HeatmapData, RadarData,
+        AreaData, BubblePoint, Candle, ChoroplethData, ContourData, DataPoint, DepthData,
+        DepthLevel, GaugeData, HeatmapData, RadarData, candle_epoch,
     },
-    interaction::{GridDatum, RadarDatum, RegionDatum, SliceDatum},
+    interaction::{AreaDatum, DepthDatum, GridDatum, RadarDatum, RegionDatum, SliceDatum},
+    theme_color::{ResolvedColorScale, categorical_color, with_resolved_colors},
 };
 
-const PIE_DEFAULT_COLORS: [u32; 8] = [
-    0x003B_82F6,
-    0x0022_C55E,
-    0x00EF_4444,
-    0x00F5_9E0B,
-    0x008B_5CF6,
-    0x00EC_4899,
-    0x0006_B6D4,
-    0x00F9_7316,
-];
-const VIRIDIS_STOPS: [(f32, Srgb); 5] = [
-    (0.0, Srgb::from_hex("#440154")),
-    (0.25, Srgb::from_hex("#3B528B")),
-    (0.5, Srgb::from_hex("#21918C")),
-    (0.75, Srgb::from_hex("#5EC962")),
-    (1.0, Srgb::from_hex("#FDE725")),
-];
+const DEFAULT_AREA_FILL_ALPHA: f32 = 0.7;
 
 /// One item of a keyed collection: the datum's place in the data, which
 /// identifies it across frames, and what is drawn for it.
@@ -87,20 +75,6 @@ where
     frame.map(move |frame| derive(&frame)).computed()
 }
 
-fn working(color: Srgb) -> WorkingColor {
-    WorkingColor::from(color)
-}
-
-/// The colour of a `[r, g, b, a]` series colour, without its alpha.
-const fn rgb(color: [f32; 4]) -> Srgb {
-    Srgb::new(color[0], color[1], color[2])
-}
-
-/// The alpha of a `[r, g, b, a]` series colour.
-const fn alpha(color: [f32; 4]) -> f32 {
-    color[3].clamp(0.0, 1.0)
-}
-
 /// An open path through `points`.
 fn polyline(points: impl IntoIterator<Item = Point>) -> Path {
     let mut points = points.into_iter();
@@ -133,50 +107,6 @@ fn polar(center: Point, radius: f32, angle: f32) -> Point {
         angle.cos().mul_add(radius, center.x),
         angle.sin().mul_add(radius, center.y),
     )
-}
-
-fn srgb_lerp(a: Srgb, b: Srgb, t: f32) -> Srgb {
-    let t = t.clamp(0.0, 1.0);
-    Srgb::new(
-        (b.red - a.red).mul_add(t, a.red),
-        (b.green - a.green).mul_add(t, a.green),
-        (b.blue - a.blue).mul_add(t, a.blue),
-    )
-}
-
-/// Interpolates `stops` at `value` within `min..=max`.
-fn color_at(stops: &[(f32, Srgb)], value: f32, min: f32, max: f32) -> Srgb {
-    let t = if max > min {
-        ((value - min) / (max - min)).clamp(0.0, 1.0)
-    } else {
-        0.0
-    };
-
-    let mut previous = stops[0];
-    if t <= previous.0 {
-        return previous.1;
-    }
-
-    for &(stop_t, stop_color) in &stops[1..] {
-        if t <= stop_t {
-            let span = (stop_t - previous.0).max(f32::EPSILON);
-            return srgb_lerp(previous.1, stop_color, (t - previous.0) / span);
-        }
-        previous = (stop_t, stop_color);
-    }
-
-    previous.1
-}
-
-fn color_from_scale(scale: &ColorScale, value: f32, min: f32, max: f32) -> Srgb {
-    if scale.stops.is_empty() {
-        return Srgb::new(0.5, 0.5, 0.5);
-    }
-    color_at(&scale.stops, value, min, max)
-}
-
-fn viridis(value: f32, min: f32, max: f32) -> Srgb {
-    color_at(&VIRIDIS_STOPS, value, min, max)
 }
 
 // ---------------------------------------------------------------- line
@@ -220,24 +150,24 @@ fn line_items(
 pub fn record_line(
     cx: &mut Cx,
     frame: &Computed<CartesianFrame<Vec<DataPoint>, DataPoint>>,
-    color: Srgb,
+    color: &Computed<WorkingColor>,
     line_width: f32,
     show_fill: bool,
     fill_opacity: f32,
 ) {
-    let color = working(color);
+    let fill_color = color
+        .map(move |color| color.with_alpha((color.components[3] * fill_opacity).clamp(0.0, 1.0)))
+        .computed();
+    let stroke_color = color.clone();
     let lines = items(frame, move |frame| line_items(frame, show_fill));
     cx.each(lines, key_of, move |cx, line| {
         if show_fill {
-            cx.fill(
-                line.map(|line| line.value.area),
-                color.with_alpha(fill_opacity),
-            );
+            cx.fill(line.map(|line| line.value.area), fill_color.clone());
         }
         cx.stroke(
             line.map(|line| line.value.line),
             StrokeStyle::new(line_width),
-            color,
+            stroke_color.clone(),
         );
     });
 }
@@ -267,12 +197,12 @@ fn bar_items(frame: &CartesianFrame<Vec<DataPoint>, DataPoint>) -> Vec<Keyed<Rec
 pub fn record_bar(
     cx: &mut Cx,
     frame: &Computed<CartesianFrame<Vec<DataPoint>, DataPoint>>,
-    color: Srgb,
+    color: &Computed<WorkingColor>,
 ) {
-    let color = working(color);
+    let color = color.clone();
     let bars = items(frame, bar_items);
     cx.each(bars, key_of, move |cx, bar| {
-        cx.fill(bar.map(|bar| bar.value), color);
+        cx.fill(bar.map(|bar| bar.value), color.clone());
     });
 }
 
@@ -295,13 +225,13 @@ fn scatter_items(
 pub fn record_scatter(
     cx: &mut Cx,
     frame: &Computed<CartesianFrame<Vec<DataPoint>, DataPoint>>,
-    color: Srgb,
+    color: &Computed<WorkingColor>,
     radius: f32,
 ) {
-    let color = working(color);
+    let color = color.clone();
     let dots = items(frame, move |frame| scatter_items(frame, radius));
     cx.each(dots, key_of, move |cx, dot| {
-        cx.fill(dot.map(|dot| dot.value), color);
+        cx.fill(dot.map(|dot| dot.value), color.clone());
     });
 }
 
@@ -315,7 +245,7 @@ struct BubbleItem {
 
 fn bubble_items(
     frame: &CartesianFrame<Vec<BubblePoint>, BubblePoint>,
-    default_color: Srgb,
+    colors: &[WorkingColor],
     min_radius: f32,
     max_radius: f32,
     opacity: f32,
@@ -323,30 +253,43 @@ fn bubble_items(
     let plot = plot_rect(frame.size, PLOT_PADDING_RATIO);
     let bounds = frame.geometry.bounds;
     let radii = BubbleRadii::new(&frame.data, min_radius, max_radius);
-    enumerated(frame.data.iter().map(|point| {
-        let (color, point_alpha) = if point.color[3] > 0.0 {
-            (rgb(point.color), alpha(point.color))
-        } else {
-            (default_color, opacity)
-        };
-        BubbleItem {
-            circle: Circle::new(map_xy(plot, bounds, point.x, point.y), radii.radius(point)),
-            color: working(color).with_alpha((point_alpha * opacity).clamp(0.0, 1.0)),
-        }
-    }))
+    enumerated(
+        frame
+            .data
+            .iter()
+            .zip(colors)
+            .map(|(point, color)| BubbleItem {
+                circle: Circle::new(map_xy(plot, bounds, point.x, point.y), radii.radius(point)),
+                color: color.with_alpha((color.components[3] * opacity).clamp(0.0, 1.0)),
+            }),
+    )
 }
 
 pub fn record_bubble(
     cx: &mut Cx,
     frame: &Computed<CartesianFrame<Vec<BubblePoint>, BubblePoint>>,
-    default_color: Srgb,
+    env: &Environment,
+    default_color: &Computed<WorkingColor>,
     min_radius: f32,
     max_radius: f32,
     opacity: f32,
 ) {
-    let bubbles = items(frame, move |frame| {
-        bubble_items(frame, default_color, min_radius, max_radius, opacity)
+    let default_color = default_color.clone();
+    let resolved = with_resolved_colors(frame, env, move |frame, env| {
+        frame
+            .data
+            .iter()
+            .map(|point| {
+                point
+                    .color
+                    .as_ref()
+                    .map_or_else(|| default_color.clone(), |color| color.resolve(env))
+            })
+            .collect()
     });
+    let bubbles = resolved
+        .map(move |(frame, colors)| bubble_items(&frame, &colors, min_radius, max_radius, opacity))
+        .computed();
     cx.each(bubbles, key_of, move |cx, bubble| {
         cx.fill(
             bubble.map(|bubble| bubble.value.circle),
@@ -366,8 +309,8 @@ struct CandleItem {
 
 fn candle_items(
     frame: &CartesianFrame<Vec<Candle>, Candle>,
-    bullish: Srgb,
-    bearish: Srgb,
+    bullish: WorkingColor,
+    bearish: WorkingColor,
 ) -> Vec<Keyed<CandleItem>> {
     let data = &frame.data;
     if data.is_empty() {
@@ -376,7 +319,7 @@ fn candle_items(
     let plot = plot_rect(frame.size, PLOT_PADDING_RATIO);
     let bounds = frame.geometry.bounds;
     let candle_width = (plot.width() / usize_to_f32(data.len()) * 0.65).max(1.0);
-    let epoch = crate::data::candle_epoch(data);
+    let epoch = candle_epoch(data);
     enumerated(data.iter().map(|candle| {
         let CandleLayout {
             x,
@@ -393,11 +336,11 @@ fn candle_items(
                 Point::new(candle_width.mul_add(-0.5, x), top),
                 Size::new(candle_width, (bottom - top).max(1.0)),
             ),
-            color: working(if candle.close >= candle.open {
+            color: if candle.close >= candle.open {
                 bullish
             } else {
                 bearish
-            }),
+            },
         }
     }))
 }
@@ -405,10 +348,14 @@ fn candle_items(
 pub fn record_candlestick(
     cx: &mut Cx,
     frame: &Computed<CartesianFrame<Vec<Candle>, Candle>>,
-    bullish: Srgb,
-    bearish: Srgb,
+    bullish: &Computed<WorkingColor>,
+    bearish: &Computed<WorkingColor>,
 ) {
-    let candles = items(frame, move |frame| candle_items(frame, bullish, bearish));
+    let candles = frame
+        .zip(bullish)
+        .zip(bearish)
+        .map(|((frame, bullish), bearish)| candle_items(&frame, bullish, bearish))
+        .computed();
     cx.each(candles, key_of, move |cx, candle| {
         cx.stroke(
             candle.map(|candle| candle.value.wick),
@@ -432,13 +379,13 @@ struct DepthLayer {
 }
 
 fn depth_items(
-    frame: &CartesianFrame<DepthData, crate::interaction::DepthDatum>,
-    bid: Srgb,
-    ask: Srgb,
+    frame: &CartesianFrame<DepthData, DepthDatum>,
+    bid: WorkingColor,
+    ask: WorkingColor,
 ) -> Vec<Keyed<DepthLayer>> {
     let plot = plot_rect(frame.size, PLOT_PADDING_RATIO);
     let bounds = frame.geometry.bounds;
-    let layer = |levels: &[crate::data::DepthLevel], color: Srgb| {
+    let layer = |levels: &[DepthLevel], color: WorkingColor| {
         let (first, last) = (levels.first()?, levels.last()?);
         let curve: Vec<Point> = levels
             .iter()
@@ -446,12 +393,12 @@ fn depth_items(
             .collect();
         Some(DepthLayer {
             fill: polygon(
-                core::iter::once(map_xy(plot, bounds, first.price, 0.0))
+                iter::once(map_xy(plot, bounds, first.price, 0.0))
                     .chain(curve.iter().copied())
-                    .chain(core::iter::once(map_xy(plot, bounds, last.price, 0.0))),
+                    .chain(iter::once(map_xy(plot, bounds, last.price, 0.0))),
             ),
             outline: polyline(curve),
-            color: working(color),
+            color,
         })
     };
     [
@@ -465,15 +412,24 @@ fn depth_items(
 
 pub fn record_depth(
     cx: &mut Cx,
-    frame: &Computed<CartesianFrame<DepthData, crate::interaction::DepthDatum>>,
-    bid: Srgb,
-    ask: Srgb,
+    frame: &Computed<CartesianFrame<DepthData, DepthDatum>>,
+    bid: &Computed<WorkingColor>,
+    ask: &Computed<WorkingColor>,
 ) {
-    let layers = items(frame, move |frame| depth_items(frame, bid, ask));
+    let layers = frame
+        .zip(bid)
+        .zip(ask)
+        .map(|((frame, bid), ask)| depth_items(&frame, bid, ask))
+        .computed();
     cx.each(layers, key_of, move |cx, layer| {
         cx.fill(
             layer.map(|layer| layer.value.fill),
-            layer.map(|layer| layer.value.color.with_alpha(0.28)),
+            layer.map(|layer| {
+                layer
+                    .value
+                    .color
+                    .with_alpha((layer.value.color.components[3] * 0.28).clamp(0.0, 1.0))
+            }),
         );
         cx.stroke(
             layer.map(|layer| layer.value.outline),
@@ -494,7 +450,8 @@ struct AreaLayer {
 }
 
 fn area_items(
-    frame: &CartesianFrame<AreaData, crate::interaction::AreaDatum>,
+    frame: &CartesianFrame<AreaData, AreaDatum>,
+    colors: &[WorkingColor],
 ) -> Vec<Keyed<AreaLayer>> {
     let data = &frame.data;
     if data.x_values.is_empty() {
@@ -504,10 +461,10 @@ fn area_items(
     let bounds = frame.geometry.bounds;
     area_layers(data)
         .into_iter()
-        .zip(&data.series)
+        .zip(colors)
         .enumerate()
         .filter(|(_, ((base, _), _))| !base.is_empty())
-        .map(|(key, ((base, top), series))| {
+        .map(|(key, ((base, top), &color))| {
             let edge = |values: &[f32]| -> Vec<Point> {
                 data.x_values
                     .iter()
@@ -522,8 +479,10 @@ fn area_items(
                 value: AreaLayer {
                     fill: polygon(top_edge.iter().copied().chain(base_edge.into_iter().rev())),
                     top: polyline(top_edge),
-                    fill_color: working(rgb(series.color)).with_alpha(alpha(series.color)),
-                    line_color: working(rgb(series.color)),
+                    fill_color: color.with_alpha(
+                        (color.components[3] * DEFAULT_AREA_FILL_ALPHA).clamp(0.0, 1.0),
+                    ),
+                    line_color: color,
                 },
             }
         })
@@ -532,9 +491,27 @@ fn area_items(
 
 pub fn record_area(
     cx: &mut Cx,
-    frame: &Computed<CartesianFrame<AreaData, crate::interaction::AreaDatum>>,
+    frame: &Computed<CartesianFrame<AreaData, AreaDatum>>,
+    env: &Environment,
 ) {
-    let layers = items(frame, area_items);
+    let resolved = with_resolved_colors(frame, env, |frame, env| {
+        frame
+            .data
+            .series
+            .iter()
+            .enumerate()
+            .map(|(index, series)| {
+                series
+                    .color
+                    .as_ref()
+                    .map_or_else(|| categorical_color(index), Clone::clone)
+                    .resolve(env)
+            })
+            .collect()
+    });
+    let layers = resolved
+        .map(|(frame, colors)| area_items(&frame, &colors))
+        .computed();
     cx.each(layers, key_of, move |cx, layer| {
         cx.fill(
             layer.map(|layer| layer.value.fill),
@@ -579,7 +556,8 @@ fn slice_path(center: Point, inner_r: f32, outer_r: f32, start: f32, end: f32) -
 
 fn pie_items(
     frame: &Frame<Vec<DataPoint>, HitTargets<SliceDatum>>,
-    colors: &[Srgb],
+    colors: &[WorkingColor],
+    defaults: &[WorkingColor],
     inner_radius: f32,
 ) -> Vec<Keyed<Slice>> {
     let (center, outer_r) = pie_circle(frame.size);
@@ -590,9 +568,10 @@ fn pie_items(
             key,
             value: Slice {
                 path: slice_path(center, inner_r, outer_r, start, end),
-                color: working(colors.get(key).copied().unwrap_or_else(|| {
-                    Srgb::from_u32(PIE_DEFAULT_COLORS[key % PIE_DEFAULT_COLORS.len()])
-                })),
+                color: colors
+                    .get(key)
+                    .copied()
+                    .unwrap_or_else(|| defaults[key % defaults.len()]),
             },
         })
         .collect()
@@ -601,10 +580,15 @@ fn pie_items(
 pub fn record_pie(
     cx: &mut Cx,
     frame: &Computed<Frame<Vec<DataPoint>, HitTargets<SliceDatum>>>,
-    colors: Vec<Srgb>,
+    colors: &Computed<Vec<WorkingColor>>,
+    defaults: &Computed<Vec<WorkingColor>>,
     inner_radius: f32,
 ) {
-    let slices = items(frame, move |frame| pie_items(frame, &colors, inner_radius));
+    let slices = frame
+        .zip(colors)
+        .zip(defaults)
+        .map(move |((frame, colors), defaults)| pie_items(&frame, &colors, &defaults, inner_radius))
+        .computed();
     cx.each(slices, key_of, move |cx, slice| {
         cx.fill(
             slice.map(|slice| slice.value.path),
@@ -636,13 +620,12 @@ struct GaugeStyle {
     end_angle: f32,
     inner_radius: f32,
     outer_radius: f32,
-    background: Srgb,
-    value: Srgb,
 }
 
 fn gauge_arcs(
     frame: &Frame<GaugeData, HitTargets<SliceDatum>>,
     style: GaugeStyle,
+    colors: &[WorkingColor],
 ) -> Vec<Keyed<RingArc>> {
     let data = &frame.data;
     let (center, inner_r, outer_r) = gauge_ring(frame.size, style.inner_radius, style.outer_radius);
@@ -657,14 +640,12 @@ fn gauge_arcs(
     };
 
     let span = style.end_angle - style.start_angle;
-    let mut arcs = alloc::vec![arc(
-        style.start_angle,
-        style.end_angle,
-        working(style.background)
-    )];
+    let background = colors[0];
+    let value_color = colors[1];
+    let mut arcs = vec![arc(style.start_angle, style.end_angle, background)];
     if data.regions.is_empty() {
         let value_end = span.mul_add(data.normalized_value(), style.start_angle);
-        arcs.push(arc(style.start_angle, value_end, working(style.value)));
+        arcs.push(arc(style.start_angle, value_end, value_color));
     } else {
         let value_span = data.max_value - data.min_value;
         assert!(
@@ -672,13 +653,13 @@ fn gauge_arcs(
             "a gauge with regions requires finite max_value > min_value"
         );
         let mut last_threshold = data.min_value;
-        for region in &data.regions {
+        for (region, &color) in data.regions.iter().zip(&colors[2..]) {
             let start_t = ((last_threshold - data.min_value) / value_span).clamp(0.0, 1.0);
             let end_t = ((region.threshold - data.min_value) / value_span).clamp(0.0, 1.0);
             arcs.push(arc(
                 span.mul_add(start_t, style.start_angle),
                 span.mul_add(end_t, style.start_angle),
-                working(rgb(region.color)),
+                color,
             ));
             last_threshold = region.threshold;
         }
@@ -712,23 +693,39 @@ fn gauge_needle(
 pub fn record_gauge(
     cx: &mut Cx,
     frame: &Computed<Frame<GaugeData, HitTargets<SliceDatum>>>,
+    env: &Environment,
     start_angle: f32,
     end_angle: f32,
     inner_radius: f32,
     outer_radius: f32,
-    background: Srgb,
-    value: Srgb,
-    needle: Srgb,
+    background: &Computed<WorkingColor>,
+    value: &Computed<WorkingColor>,
+    needle: &Computed<WorkingColor>,
 ) {
     let style = GaugeStyle {
         start_angle,
         end_angle,
         inner_radius,
         outer_radius,
-        background,
-        value,
     };
-    let arcs = items(frame, move |frame| gauge_arcs(frame, style));
+    let background = background.clone();
+    let value = value.clone();
+    let resolved = with_resolved_colors(frame, env, move |frame, env| {
+        let mut colors = Vec::with_capacity(2 + frame.data.regions.len());
+        colors.push(background.clone());
+        colors.push(value.clone());
+        colors.extend(
+            frame
+                .data
+                .regions
+                .iter()
+                .map(|region| region.color.resolve(env)),
+        );
+        colors
+    });
+    let arcs = resolved
+        .map(move |(frame, colors)| gauge_arcs(&frame, style, &colors))
+        .computed();
     cx.each(arcs, key_of, move |cx, arc| {
         cx.stroke(
             arc.map(|arc| arc.value.path),
@@ -736,15 +733,15 @@ pub fn record_gauge(
             arc.map(|arc| arc.value.color),
         );
     });
-    let needle_color = working(needle);
+    let needle_color = needle.clone();
     let needles = items(frame, move |frame| gauge_needle(frame, style));
     cx.each(needles, key_of, move |cx, needle| {
         cx.stroke(
             needle.map(|needle| needle.value.line),
             needle.map(|needle| StrokeStyle::new(needle.value.width)),
-            needle_color,
+            needle_color.clone(),
         );
-        cx.fill(needle.map(|needle| needle.value.hub), needle_color);
+        cx.fill(needle.map(|needle| needle.value.hub), needle_color.clone());
     });
 }
 
@@ -794,6 +791,7 @@ fn radar_axes(frame: &Frame<RadarData, HitTargets<RadarDatum>>) -> Vec<Keyed<Lin
 
 fn radar_series(
     frame: &Frame<RadarData, HitTargets<RadarDatum>>,
+    colors: &[WorkingColor],
     fill_opacity: f32,
 ) -> Vec<Keyed<RadarSeriesItem>> {
     let data = &frame.data;
@@ -805,17 +803,18 @@ fn radar_series(
     let max_value = data.max_value.max(1.0);
     data.series
         .iter()
+        .zip(colors)
         .enumerate()
-        .filter(|(_, series)| series.values.len() >= axis_count)
-        .map(|(key, series)| Keyed {
+        .filter(|(_, (series, _))| series.values.len() >= axis_count)
+        .map(|(key, (series, &color))| Keyed {
             key,
             value: RadarSeriesItem {
                 polygon: polygon((0..axis_count).map(|axis| {
                     let ratio = (series.values[axis] / max_value).clamp(0.0, 1.0);
                     polar(center, radius * ratio, radar_angle(axis, axis_count))
                 })),
-                color: working(rgb(series.color)),
-                fill_alpha: (fill_opacity * alpha(series.color)).clamp(0.0, 1.0),
+                color,
+                fill_alpha: (fill_opacity * color.components[3]).clamp(0.0, 1.0),
             },
         })
         .collect()
@@ -824,20 +823,47 @@ fn radar_series(
 pub fn record_radar(
     cx: &mut Cx,
     frame: &Computed<Frame<RadarData, HitTargets<RadarDatum>>>,
+    env: &Environment,
     ring_count: u32,
     line_width: f32,
     fill_opacity: f32,
 ) {
-    let grid = working(Srgb::new(0.5, 0.5, 0.5));
+    let grid = Color::border().resolve(env);
     let rings = items(frame, move |frame| radar_rings(frame, ring_count));
+    let ring_grid = grid.clone();
     cx.each(rings, key_of, move |cx, ring| {
-        cx.stroke(ring.map(|ring| ring.value), StrokeStyle::new(1.0), grid);
+        cx.stroke(
+            ring.map(|ring| ring.value),
+            StrokeStyle::new(1.0),
+            ring_grid.clone(),
+        );
     });
     let axes = items(frame, radar_axes);
     cx.each(axes, key_of, move |cx, axis| {
-        cx.stroke(axis.map(|axis| axis.value), StrokeStyle::new(1.0), grid);
+        cx.stroke(
+            axis.map(|axis| axis.value),
+            StrokeStyle::new(1.0),
+            grid.clone(),
+        );
     });
-    let series = items(frame, move |frame| radar_series(frame, fill_opacity));
+    let resolved = with_resolved_colors(frame, env, |frame, env| {
+        frame
+            .data
+            .series
+            .iter()
+            .enumerate()
+            .map(|(index, series)| {
+                series
+                    .color
+                    .as_ref()
+                    .map_or_else(|| categorical_color(index), Clone::clone)
+                    .resolve(env)
+            })
+            .collect()
+    });
+    let series = resolved
+        .map(move |(frame, colors)| radar_series(&frame, &colors, fill_opacity))
+        .computed();
     cx.each(series, key_of, move |cx, series| {
         cx.fill(
             series.map(|series| series.value.polygon),
@@ -859,7 +885,7 @@ struct Cell {
     color: WorkingColor,
 }
 
-/// One cell for each value of a `rows` by `cols` grid, coloured by `viridis`
+/// One cell for each value of a `rows` by `cols` grid, coloured by `scale`
 /// at `alpha`.
 fn heat_cells(
     size: Size,
@@ -867,6 +893,7 @@ fn heat_cells(
     cols: u32,
     values: &[f32],
     range: (f32, f32),
+    scale: &ResolvedColorScale,
     alpha: f32,
 ) -> Vec<Keyed<Cell>> {
     if rows == 0 || cols == 0 || values.is_empty() {
@@ -878,11 +905,12 @@ fn heat_cells(
         .flat_map(|row| (0..cols_n).map(move |col| (row, col)))
         .map(|(row, col)| {
             let key = row * cols_n + col;
+            let color = scale.color_at(values[key], range.0, range.1);
             Keyed {
                 key,
                 value: Cell {
                     rect: grid_cell(plot, rows, cols, row, col),
-                    color: working(viridis(values[key], range.0, range.1)).with_alpha(alpha),
+                    color: color.with_alpha((color.components[3] * alpha).clamp(0.0, 1.0)),
                 },
             }
         })
@@ -898,18 +926,26 @@ fn record_cells(cx: &mut Cx, cells: Computed<Vec<Keyed<Cell>>>) {
     });
 }
 
-pub fn record_heatmap(cx: &mut Cx, frame: &Computed<Frame<HeatmapData, HitTargets<GridDatum>>>) {
-    let cells = items(frame, |frame| {
-        let data = &frame.data;
-        heat_cells(
-            frame.size,
-            data.rows,
-            data.cols,
-            &data.values,
-            (data.min_value, data.max_value),
-            1.0,
-        )
-    });
+pub fn record_heatmap(
+    cx: &mut Cx,
+    frame: &Computed<Frame<HeatmapData, HitTargets<GridDatum>>>,
+    scale: &Computed<ResolvedColorScale>,
+) {
+    let cells = frame
+        .zip(scale)
+        .map(|(frame, scale)| {
+            let data = &frame.data;
+            heat_cells(
+                frame.size,
+                data.rows,
+                data.cols,
+                &data.values,
+                (data.min_value, data.max_value),
+                &scale,
+                1.0,
+            )
+        })
+        .computed();
     record_cells(cx, cells);
 }
 
@@ -941,7 +977,10 @@ const fn contour_drawn(data: &ContourData) -> bool {
     data.rows >= 2 && data.cols >= 2 && !data.values.is_empty() && !data.levels.is_empty()
 }
 
-fn contour_levels(frame: &Frame<ContourData, HitTargets<GridDatum>>) -> Vec<Keyed<Level>> {
+fn contour_levels(
+    frame: &Frame<ContourData, HitTargets<GridDatum>>,
+    scale: &ResolvedColorScale,
+) -> Vec<Keyed<Level>> {
     let data = &frame.data;
     if !contour_drawn(data) {
         return Vec::new();
@@ -1009,7 +1048,7 @@ fn contour_levels(frame: &Frame<ContourData, HitTargets<GridDatum>>) -> Vec<Keye
                 key,
                 value: Level {
                     path: path.build(),
-                    color: working(viridis(level, data.min_value, data.max_value)),
+                    color: scale.color_at(level, data.min_value, data.max_value),
                 },
             })
         })
@@ -1019,25 +1058,33 @@ fn contour_levels(frame: &Frame<ContourData, HitTargets<GridDatum>>) -> Vec<Keye
 pub fn record_contour(
     cx: &mut Cx,
     frame: &Computed<Frame<ContourData, HitTargets<GridDatum>>>,
+    scale: &Computed<ResolvedColorScale>,
     line_width: f32,
 ) {
     // A faint tint of the field under the lines.
-    let tint = items(frame, |frame| {
-        let data = &frame.data;
-        if !contour_drawn(data) {
-            return Vec::new();
-        }
-        heat_cells(
-            frame.size,
-            data.rows,
-            data.cols,
-            &data.values,
-            (data.min_value, data.max_value),
-            0.08,
-        )
-    });
+    let tint = frame
+        .zip(scale)
+        .map(|(frame, scale)| {
+            let data = &frame.data;
+            if !contour_drawn(data) {
+                return Vec::new();
+            }
+            heat_cells(
+                frame.size,
+                data.rows,
+                data.cols,
+                &data.values,
+                (data.min_value, data.max_value),
+                &scale,
+                0.08,
+            )
+        })
+        .computed();
     record_cells(cx, tint);
-    let levels = items(frame, contour_levels);
+    let levels = frame
+        .zip(scale)
+        .map(|(frame, scale)| contour_levels(&frame, &scale))
+        .computed();
     cx.each(levels, key_of, move |cx, level| {
         cx.stroke(
             level.map(|level| level.value.path),
@@ -1057,8 +1104,20 @@ struct Region {
 
 fn choropleth_regions(
     frame: &Frame<ChoroplethData, HitTargets<RegionDatum>>,
+    colors: &[WorkingColor],
 ) -> Vec<Keyed<Region>> {
     let data = &frame.data;
+    let positions: Vec<f32> = data
+        .color_scale
+        .stops
+        .iter()
+        .map(|(stop, _)| *stop)
+        .collect();
+    let fallback = colors
+        .last()
+        .copied()
+        .expect("resolved choropleth colors include fallback");
+    let scale = ResolvedColorScale::from_parts(&positions, &colors[..positions.len()], fallback);
     let projection = MapProjection::new(frame.size, data);
     data.polygons
         .iter()
@@ -1073,12 +1132,7 @@ fn choropleth_regions(
                         .iter()
                         .map(|vertex| projection.point(*vertex)),
                 ),
-                color: working(color_from_scale(
-                    &data.color_scale,
-                    region.value,
-                    data.min_value,
-                    data.max_value,
-                )),
+                color: scale.color_at(region.value, data.min_value, data.max_value),
             },
         })
         .collect()
@@ -1087,12 +1141,26 @@ fn choropleth_regions(
 pub fn record_choropleth(
     cx: &mut Cx,
     frame: &Computed<Frame<ChoroplethData, HitTargets<RegionDatum>>>,
+    env: &Environment,
     stroke_width: f32,
-    stroke_color: Srgb,
+    stroke_color: &Computed<WorkingColor>,
     show_stroke: bool,
 ) {
-    let stroke_color = working(stroke_color);
-    let regions = items(frame, choropleth_regions);
+    let stroke_color = stroke_color.clone();
+    let resolved = with_resolved_colors(frame, env, |frame, env| {
+        let mut colors: Vec<Computed<WorkingColor>> = frame
+            .data
+            .color_scale
+            .stops
+            .iter()
+            .map(|(_, color)| color.resolve(env))
+            .collect();
+        colors.push(Color::muted_foreground().resolve(env));
+        colors
+    });
+    let regions = resolved
+        .map(|(frame, colors)| choropleth_regions(&frame, &colors))
+        .computed();
     cx.each(regions, key_of, move |cx, region| {
         cx.fill(
             region.map(|region| region.value.path),
@@ -1102,7 +1170,7 @@ pub fn record_choropleth(
             cx.stroke(
                 region.map(|region| region.value.path),
                 StrokeStyle::new(stroke_width),
-                stroke_color,
+                stroke_color.clone(),
             );
         }
     });
@@ -1111,6 +1179,10 @@ pub fn record_choropleth(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::data::ColorScale;
+    use crate::theme_color::resolve_color_scale;
+    use nami::Signal;
+    use waterui_graphics::color::{Srgb, install_color_signal, token::MutedForeground};
 
     #[test]
     fn a_full_circle_slice_is_one_closed_path() {
@@ -1131,7 +1203,19 @@ mod tests {
 
     #[test]
     fn viridis_runs_from_its_first_to_its_last_stop() {
-        assert_eq!(viridis(0.0, 0.0, 1.0), VIRIDIS_STOPS[0].1);
-        assert_eq!(viridis(1.0, 0.0, 1.0), VIRIDIS_STOPS[4].1);
+        let mut env = Environment::new();
+        install_color_signal::<MutedForeground>(
+            &mut env,
+            Computed::constant(WorkingColor::from(Srgb::new(0.5, 0.5, 0.5))),
+        );
+        let scale = resolve_color_scale(&ColorScale::viridis(), &env).snapshot();
+        assert_eq!(
+            scale.color_at(0.0, 0.0, 1.0),
+            WorkingColor::from(Srgb::from_hex("#440154"))
+        );
+        assert_eq!(
+            scale.color_at(1.0, 0.0, 1.0),
+            WorkingColor::from(Srgb::from_hex("#FDE725"))
+        );
     }
 }

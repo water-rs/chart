@@ -182,7 +182,7 @@ pub fn bubble_geometry(
     for (index, point) in data.iter().enumerate() {
         let anchor = map_xy(plot, bounds, point.x, point.y);
         targets.push_circle(
-            HitResult::new(0, index, *point, anchor),
+            HitResult::new(0, index, point.clone(), anchor),
             anchor,
             radii.radius(point).max(6.0),
         );

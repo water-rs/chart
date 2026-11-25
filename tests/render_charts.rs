@@ -14,6 +14,7 @@ use std::path::PathBuf;
 use waterui::animation::Animation;
 use waterui::graphics::color::Srgb;
 use waterui::reactive::{SignalExt as _, binding};
+use waterui::theme::color::{Accent, Error, Tertiary};
 use waterui::{Binding, View, ViewExt as _};
 use waterui_chart::{
     AreaChart, BarChart, BubbleChart, CandlestickChart, ChoroplethChart, ChoroplethData,
@@ -133,9 +134,9 @@ fn gauge_chart() {
     render("gauge-regions", || {
         GaugeChart::new(Binding::container(
             GaugeData::new(72.0, 0.0, 100.0)
-                .region(GaugeRegion::hex(40.0, "#22C55E"))
-                .region(GaugeRegion::hex(75.0, "#F59E0B"))
-                .region(GaugeRegion::hex(100.0, "#EF4444")),
+                .region(GaugeRegion::new(40.0, Accent))
+                .region(GaugeRegion::new(75.0, Tertiary))
+                .region(GaugeRegion::new(100.0, Error)),
         ))
     });
 }
@@ -146,14 +147,8 @@ fn radar_chart() {
         RadarChart::new(Binding::container(
             RadarData::new(6)
                 .max_value(10.0)
-                .series(
-                    RadarSeries::new("Team", vec![8.0, 6.0, 7.0, 4.0, 9.0, 5.0])
-                        .color(0.23, 0.51, 0.96, 1.0),
-                )
-                .series(
-                    RadarSeries::new("Rival", vec![5.0, 8.0, 4.0, 7.0, 6.0, 8.0])
-                        .color(0.94, 0.27, 0.27, 1.0),
-                ),
+                .series(RadarSeries::new("Team", vec![8.0, 6.0, 7.0, 4.0, 9.0, 5.0]).color(Accent))
+                .series(RadarSeries::new("Rival", vec![5.0, 8.0, 4.0, 7.0, 6.0, 8.0]).color(Error)),
         ))
     });
 }

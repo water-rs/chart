@@ -1,8 +1,8 @@
 //! Depth (order book) chart component.
 
-use nami::{Binding, Signal};
+use nami::{Binding, Signal, signal::IntoComputed};
 use waterui_core::{Environment, View};
-use waterui_graphics::color::Srgb;
+use waterui_graphics::color::Color;
 
 use crate::charts::canvas::{
     depth_bounds, depth_geometry, interactive_cartesian_signal_canvas, record_depth,
@@ -12,12 +12,13 @@ use crate::data::DepthData;
 use crate::interaction::{
     CartesianSelectionBindings, CartesianViewportBindings, DepthDatum, HitResult, SelectionBindings,
 };
+use crate::theme_color::into_color;
 
 /// Depth chart for order book visualization.
 pub struct DepthChart<S: Signal<Output = DepthData>> {
     data: S,
-    bid_color: Srgb,
-    ask_color: Srgb,
+    bid_color: Color,
+    ask_color: Color,
     selection: SelectionBindings<DepthDatum>,
     cartesian_selection: CartesianSelectionBindings,
     cartesian_viewport: CartesianViewportBindings,
@@ -32,8 +33,8 @@ impl<S: Signal<Output = DepthData>> DepthChart<S> {
     pub fn new(data: S) -> Self {
         Self {
             data,
-            bid_color: Srgb::from_hex("#22C55E"),
-            ask_color: Srgb::from_hex("#EF4444"),
+            bid_color: Color::accent(),
+            ask_color: Color::error(),
             selection: SelectionBindings::default(),
             cartesian_selection: CartesianSelectionBindings::default(),
             cartesian_viewport: CartesianViewportBindings::default(),
@@ -47,23 +48,23 @@ impl<S: Signal<Output = DepthData>> DepthChart<S> {
 
     /// Sets the bid-side fill color.
     #[must_use]
-    pub const fn bid_color(mut self, color: Srgb) -> Self {
-        self.bid_color = color;
+    pub fn bid_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.bid_color = into_color(color);
         self
     }
 
     /// Sets the ask-side fill color.
     #[must_use]
-    pub const fn ask_color(mut self, color: Srgb) -> Self {
-        self.ask_color = color;
+    pub fn ask_color(mut self, color: impl IntoComputed<Color>) -> Self {
+        self.ask_color = into_color(color);
         self
     }
 
     /// Sets both bid and ask colors.
     #[must_use]
-    pub const fn colors(mut self, bid: Srgb, ask: Srgb) -> Self {
-        self.bid_color = bid;
-        self.ask_color = ask;
+    pub fn colors(mut self, bid: impl IntoComputed<Color>, ask: impl IntoComputed<Color>) -> Self {
+        self.bid_color = into_color(bid);
+        self.ask_color = into_color(ask);
         self
     }
 
@@ -84,14 +85,14 @@ impl<S: Signal<Output = DepthData>> DepthChart<S> {
 
 impl<S: Signal<Output = DepthData> + Clone + 'static> View for DepthChart<S> {
     fn body(self, env: &Environment) -> impl View {
-        let bid_color = self.bid_color;
-        let ask_color = self.ask_color;
+        let bid_color = self.bid_color.resolve(env);
+        let ask_color = self.ask_color.resolve(env);
         interactive_cartesian_signal_canvas(
             env,
             self.data,
             depth_bounds,
             depth_geometry,
-            move |cx, frame| record_depth(cx, frame, bid_color, ask_color),
+            move |cx, frame| record_depth(cx, frame, &bid_color, &ask_color),
             self.selection,
             self.cartesian_selection,
             self.cartesian_viewport,

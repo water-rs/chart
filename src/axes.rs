@@ -231,7 +231,7 @@ impl<C: View + 'static> View for ChartAxes<C> {
 }
 
 fn grid_color() -> Color {
-    Color::srgb_f32(0.5, 0.5, 0.5).with_opacity(0.3)
+    Color::border()
 }
 
 #[derive(Clone, PartialEq)]
@@ -375,7 +375,9 @@ impl View for ReactiveAxisTick {
                 padding: self.padding,
                 label: true,
             },
-            (text(self.tick.label().to_string()).font_size(11.0),),
+            (text(self.tick.label().to_string())
+                .font_size(11.0)
+                .color(Color::muted_foreground()),),
         );
 
         absolute((grid, label))

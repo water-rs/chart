@@ -14,8 +14,8 @@
 //! # Example
 //!
 //! ```rust
-//! use waterui::color::Srgb;
 //! use waterui::prelude::*;
+//! use waterui::theme::color::Accent;
 //! use waterui_chart::{BarChart, DataPoint};
 //!
 //! # fn sales() -> impl View {
@@ -25,8 +25,7 @@
 //!     DataPoint::new(2.0, 80.0),
 //! ]);
 //!
-//! BarChart::new(data)
-//!     .color(Srgb::from_hex("#3B82F6"))
+//! BarChart::new(data).color(Accent)
 //! # }
 //! ```
 //!
@@ -68,6 +67,7 @@ pub mod data;
 pub mod interaction;
 pub mod legend;
 pub mod params;
+mod theme_color;
 pub mod tooltip;
 
 // Re-export core types
