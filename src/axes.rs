@@ -379,7 +379,7 @@ impl View for ReactiveAxisTick {
                 padding: self.padding,
                 label: true,
             },
-            (text(self.tick.label().to_string()).size(11.0),),
+            (text(self.tick.label().to_string()).font_size(11.0),),
         );
 
         absolute((grid, label))
@@ -433,13 +433,13 @@ fn axis_titles(y_label: Option<Text>, x_label: Option<Text>) -> impl View {
     absolute((
         y_label.map(|label| {
             label
-                .size(12.0)
+                .font_size(12.0)
                 .weight(FontWeight::Bold)
                 .position_in_offset(UnitPoint::TOP_LEADING, UnitPoint::TOP_LEADING, 2.0, 2.0)
         }),
         x_label.map(|label| {
             label
-                .size(12.0)
+                .font_size(12.0)
                 .weight(FontWeight::Bold)
                 .position_in_offset(UnitPoint::BOTTOM, UnitPoint::BOTTOM, 0.0, -2.0)
         }),
