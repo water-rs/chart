@@ -11,7 +11,9 @@ mod support;
 use core::time::Duration;
 use std::path::PathBuf;
 
+use waterui::animation::Animation;
 use waterui::graphics::color::Srgb;
+use waterui::reactive::{SignalExt as _, binding};
 use waterui::{Binding, View, ViewExt as _};
 use waterui_chart::{
     AreaChart, BarChart, BubbleChart, CandlestickChart, ChoroplethChart, ChoroplethData,
@@ -19,7 +21,7 @@ use waterui_chart::{
     GeoPolygon, HeatmapChart, HeatmapData, LineChart, PieChart, RadarChart, RadarData, RadarSeries,
     ScatterChart,
 };
-use waterui_testing::{OffscreenApp, ui as test_ui};
+use waterui_testing::{OffscreenApp, Snapshot, ui as test_ui};
 
 use support::{
     CHART_HEIGHT, CHART_WIDTH, area_data, bubble_series, candle_series, depth_data, pie_data,
@@ -215,25 +217,91 @@ fn choropleth_chart() {
     });
 }
 
-/// A data change cross-fades from the old frame to the new one: the frame
-/// partway through shows both, and the settled frame only the new data.
+/// Finds the top-most y row (smallest y) of bright amber bar pixels (`#F59E0B`)
+/// in the left half of `snapshot` (bar 0 of a two-bar chart).
+fn first_bar_top_y(snapshot: &Snapshot) -> u32 {
+    let width = snapshot.width();
+    let height = snapshot.height();
+    let rgba = snapshot.rgba8();
+    let half_w = width / 2;
+    for y in 0..height {
+        for x in 0..half_w {
+            let idx = ((y * width + x) * 4) as usize;
+            let (r, g, b) = (rgba[idx], rgba[idx + 1], rgba[idx + 2]);
+            if r > 200 && g > 120 && b < 60 {
+                return y;
+            }
+        }
+    }
+    panic!("expected amber bar pixels in left half of snapshot");
+}
+
+/// An unanimated data change applies immediately on the next frame with no
+/// hardcoded transition delay.
 #[test]
-fn a_data_change_cross_fades_between_frames() {
-    let data = Binding::container(point_series());
+fn an_unanimated_data_change_applies_immediately() {
+    let data = binding(vec![DataPoint::new(0.0, 20.0), DataPoint::new(1.0, 100.0)]);
     let mut app = mount({
         let data = data.clone();
         move || BarChart::new(data.clone()).color(Srgb::from_hex("#F59E0B"))
     });
-    export(&mut app, "transition-1-before");
+    let before = app.snapshot();
+    let y_before = first_bar_top_y(&before);
 
-    data.set(
-        (0_u16..24)
-            .map(|index| DataPoint::new(f32::from(index), 30.0 - f32::from(index)))
-            .collect(),
-    );
-    app.pump_for(Duration::from_millis(110));
-    export(&mut app, "transition-2-midway");
+    data.set(vec![DataPoint::new(0.0, 60.0), DataPoint::new(1.0, 100.0)]);
+    let immediate = app.snapshot();
+    let y_immediate = first_bar_top_y(&immediate);
 
     app.pump_for(Duration::from_millis(600));
+    let settled = app.snapshot();
+    let y_settled = first_bar_top_y(&settled);
+
+    assert!(
+        y_immediate + 20 < y_before,
+        "bar 0 must immediately grow taller (before top y={y_before}, immediate top y={y_immediate})"
+    );
+    assert_eq!(
+        immediate.rgba8(),
+        settled.rgba8(),
+        "unanimated update must already match the settled frame (immediate top y={y_immediate}, settled top y={y_settled})"
+    );
+}
+
+/// A spring-animated data change follows the attached `Animation::spring` and
+/// visibly overshoots its target height before settling.
+#[test]
+fn a_spring_animated_data_change_visibly_springs() {
+    let data = binding(vec![DataPoint::new(0.0, 20.0), DataPoint::new(1.0, 100.0)]);
+    let mut app = mount({
+        let data = data.clone();
+        move || {
+            BarChart::new(data.with(Animation::spring(180.0, 8.0))).color(Srgb::from_hex("#F59E0B"))
+        }
+    });
+    let y_before = first_bar_top_y(&app.snapshot());
+    export(&mut app, "transition-1-before");
+
+    data.set(vec![DataPoint::new(0.0, 60.0), DataPoint::new(1.0, 100.0)]);
+    let mut min_top_y = y_before;
+    for step in 0..30 {
+        app.pump_for(Duration::from_millis(20));
+        let top_y = first_bar_top_y(&app.snapshot());
+        min_top_y = min_top_y.min(top_y);
+        if step == 5 {
+            export(&mut app, "transition-2-midway");
+        }
+    }
+
+    app.pump_for(Duration::from_millis(2000));
+    let y_settled = first_bar_top_y(&app.snapshot());
     export(&mut app, "transition-3-settled");
+
+    assert!(
+        y_settled + 20 < y_before,
+        "bar 0 must settle taller (before top y={y_before}, settled top y={y_settled})"
+    );
+    assert!(
+        min_top_y + 4 < y_settled,
+        "underdamped spring must visibly overshoot above target height (peak top y={min_top_y}, settled top y={y_settled})"
+    );
 }

@@ -6,22 +6,19 @@
 //! closure, which runs once at mount, records the chart as keyed
 //! sub-recordings over that signal, so a change updates operands in place
 //! instead of recording again; pointer input and chart composition read the
-//! same signal. A data change cross-fades between two layers whose opacity
-//! is a live, animated operand.
+//! same signal. A data change carrying an [`Animation`](waterui_core::animation::Animation)
+//! animates its live operands with that animation; an unanimated change applies
+//! immediately.
 
 extern crate alloc;
-
-use alloc::rc::Rc;
-use core::{cell::RefCell, time::Duration};
 
 use nami::{Binding, Computed, Signal, SignalExt as _, binding};
 use waterui_accessibility::{AccessibilityHidden, AccessibilityRole};
 use waterui_core::{
     AnyView, Environment, Metadata, View,
-    animation::Animation,
     layout::{Point, Size},
 };
-use waterui_graphics::canvas::{Canvas, CanvasSize, Cx, Layer};
+use waterui_graphics::canvas::{Canvas, CanvasSize, Cx};
 use waterui_interaction::event::{HoverEvent, OnEvent};
 use waterui_interaction::gesture::{
     DragEvent, DragGesture, GestureObserver, GesturePhase, TapEvent, TapGesture,
@@ -51,9 +48,6 @@ use crate::{
     },
 };
 
-/// How long a data change takes to cross-fade.
-const CHART_TRANSITION: Animation = Animation::ease_in_out(Duration::from_millis(240));
-
 /// Everything a chart draws and answers input from, for one state of its
 /// data, viewport and canvas size.
 #[derive(Debug, Clone)]
@@ -69,84 +63,6 @@ pub(crate) struct Frame<D, G> {
 
 /// A frame of a chart over a data window.
 pub(crate) type CartesianFrame<D, T> = Frame<D, CartesianGeometry<T>>;
-
-/// One of the two layers a data change cross-fades between.
-#[derive(Clone)]
-struct Slot<D: 'static, G: 'static> {
-    frame: Binding<Frame<D, G>>,
-    present: Binding<bool>,
-    opacity: Binding<f32>,
-}
-
-impl<D: Clone + 'static, G: Clone + 'static> Slot<D, G> {
-    fn new(frame: Frame<D, G>, shown: bool) -> Self {
-        Self {
-            frame: binding(frame),
-            present: binding(shown),
-            opacity: binding(if shown { 1.0_f32 } else { 0.0_f32 }),
-        }
-    }
-}
-
-/// Which layer shows the data, and the data it shows.
-struct Showing<D> {
-    active: usize,
-    data: D,
-}
-
-/// Records `draw` over `frame` into two layers and keeps them showing the
-/// frame: a change of the geometry alone updates the showing layer in place;
-/// a change of the data records into the other layer and cross-fades to it
-/// under [`CHART_TRANSITION`].
-fn record_frames<D, G>(
-    cx: &mut Cx,
-    frame: &Computed<Frame<D, G>>,
-    draw: impl Fn(&mut Cx, &Computed<Frame<D, G>>) + 'static,
-) where
-    D: Clone + PartialEq + 'static,
-    G: Clone + 'static,
-{
-    let initial = frame.snapshot();
-    let showing = RefCell::new(Showing {
-        active: 0,
-        data: initial.data.clone(),
-    });
-    let slots = [Slot::new(initial.clone(), true), Slot::new(initial, false)];
-
-    let draw = Rc::new(draw);
-    for slot in &slots {
-        let draw = Rc::clone(&draw);
-        let content = slot.frame.computed();
-        let opacity = slot.opacity.with(CHART_TRANSITION).map(Layer::opacity);
-        let present = slot.present.clone();
-        cx.layer(opacity, move |cx| {
-            cx.scope(present, move |cx, present: &bool| {
-                if *present {
-                    draw(cx, &content);
-                }
-            });
-        });
-    }
-
-    let follow = frame.watch(move |change| {
-        let next = change.into_value();
-        let mut showing = showing.borrow_mut();
-        if showing.data == next.data {
-            slots[showing.active].frame.set(next);
-            return;
-        }
-        let incoming = &slots[1 - showing.active];
-        incoming.frame.set(next.clone());
-        if !incoming.present.snapshot() {
-            incoming.present.set(true);
-        }
-        incoming.opacity.set(1.0);
-        slots[showing.active].opacity.set(0.0);
-        showing.active = 1 - showing.active;
-        showing.data = next.data;
-    });
-    cx.keep(follow);
-}
 
 /// Keeps a chart canvas out of the accessibility tree when the chart itself
 /// carries the role: the chart is one element, not a canvas inside it.
@@ -243,7 +159,7 @@ where
     };
     let canvas = {
         let frame = frame.clone();
-        Canvas::new(move |cx| record_frames(cx, &frame, draw_chart)).sized_by(size)
+        Canvas::new(move |cx| draw_chart(cx, &frame)).sized_by(size)
     };
     let canvas = ChartCanvasAccessibilityBoundary::new(canvas);
     let canvas = Metadata::new(
@@ -517,7 +433,7 @@ where
         .computed();
     let canvas = {
         let frame = frame.clone();
-        Canvas::new(move |cx| record_frames(cx, &frame, draw_chart)).sized_by(size)
+        Canvas::new(move |cx| draw_chart(cx, &frame)).sized_by(size)
     };
     let canvas = ChartCanvasAccessibilityBoundary::new(canvas);
     let canvas = Metadata::new(

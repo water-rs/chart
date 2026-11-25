@@ -60,7 +60,6 @@
 
 extern crate alloc;
 
-pub mod animation;
 pub mod axes;
 pub mod axis;
 pub mod charts;
@@ -72,19 +71,14 @@ pub mod params;
 pub mod tooltip;
 
 // Re-export core types
-pub use animation::{ChartAnimation, ChartAnimator, EasingType};
 pub use data::{
     AreaData,
     // Area chart types
     AreaSeries,
-    // Dedicated chart data types (with impl_constant!)
-    BarData,
-    BubbleData,
     // Bubble types
     BubblePoint,
     // Candlestick/financial types
     Candle,
-    CandlestickData,
     ChoroplethData,
     ColorScale,
     // Contour types
@@ -103,13 +97,9 @@ pub use data::{
     // Heatmap types
     HeatmapCell,
     HeatmapData,
-    LineData,
-    PieData,
     // Radar types
     RadarData,
     RadarSeries,
-    ScatterData,
-    SeriesStyle,
     candle_epoch,
 };
 pub use interaction::{
