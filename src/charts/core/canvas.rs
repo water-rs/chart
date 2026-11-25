@@ -14,7 +14,7 @@ extern crate alloc;
 use alloc::rc::Rc;
 use core::{cell::RefCell, time::Duration};
 
-use nami::{Binding, Computed, Signal, SignalExt as _};
+use nami::{Binding, Computed, Signal, SignalExt as _, binding};
 use waterui_accessibility::{AccessibilityHidden, AccessibilityRole};
 use waterui_core::{
     AnyView, Environment, Metadata, View,
@@ -81,9 +81,9 @@ struct Slot<D: 'static, G: 'static> {
 impl<D: Clone + 'static, G: Clone + 'static> Slot<D, G> {
     fn new(frame: Frame<D, G>, shown: bool) -> Self {
         Self {
-            frame: Binding::container(frame),
-            present: Binding::container(shown),
-            opacity: Binding::container(if shown { 1.0 } else { 0.0 }),
+            frame: binding(frame),
+            present: binding(shown),
+            opacity: binding(if shown { 1.0_f32 } else { 0.0_f32 }),
         }
     }
 }
@@ -221,8 +221,8 @@ where
     if selection.is_active() {
         selection = selection.persist_internal();
     }
-    let x_range_start = Binding::container(None::<f32>);
-    let y_range_start = Binding::container(None::<f32>);
+    let x_range_start: Binding<Option<f32>> = binding(None);
+    let y_range_start: Binding<Option<f32>> = binding(None);
     let size = CanvasSize::new();
     let frame = {
         let cartesian_viewport = cartesian_viewport.clone();
