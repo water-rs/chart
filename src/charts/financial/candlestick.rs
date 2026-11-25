@@ -62,14 +62,14 @@ impl<S: Signal<Output = Vec<Candle>>> CandlestickChart<S> {
 
     /// Tracks the currently focused candle in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<Candle>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<Candle>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected candle in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<Candle>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<Candle>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }

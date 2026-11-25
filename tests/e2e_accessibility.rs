@@ -158,8 +158,8 @@ fn line_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
         },
         move |focused, selected| {
             LineChart::new(Binding::container(data.clone()))
-                .focused(&focused)
-                .selected(&selected)
+                .chart_focus(&focused)
+                .chart_selection(&selected)
         },
     );
 }
@@ -252,8 +252,8 @@ fn bar_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
         },
         move |focused, selected| {
             BarChart::new(Binding::container(data.clone()))
-                .focused(&focused)
-                .selected(&selected)
+                .chart_focus(&focused)
+                .chart_selection(&selected)
         },
     );
 }
@@ -281,8 +281,8 @@ fn scatter_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
         move |focused, selected| {
             ScatterChart::new(Binding::container(data.clone()))
                 .radius(6.0)
-                .focused(&focused)
-                .selected(&selected)
+                .chart_focus(&focused)
+                .chart_selection(&selected)
         },
     );
 }
@@ -311,8 +311,8 @@ fn bubble_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
             BubbleChart::new(Binding::container(data.clone()))
                 .min_radius(4.0)
                 .max_radius(18.0)
-                .focused(&focused)
-                .selected(&selected)
+                .chart_focus(&focused)
+                .chart_selection(&selected)
         },
     );
 }
@@ -345,8 +345,8 @@ fn candlestick_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
         },
         move |focused, selected| {
             CandlestickChart::new(Binding::container(data.clone()))
-                .focused(&focused)
-                .selected(&selected)
+                .chart_focus(&focused)
+                .chart_selection(&selected)
         },
     );
 }
@@ -379,8 +379,8 @@ fn depth_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
         },
         move |focused, selected| {
             DepthChart::new(Binding::container(data.clone()))
-                .focused(&focused)
-                .selected(&selected)
+                .chart_focus(&focused)
+                .chart_selection(&selected)
         },
     );
 }
@@ -412,8 +412,8 @@ fn area_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
         },
         move |focused, selected| {
             AreaChart::new(Binding::container(data.clone()))
-                .focused(&focused)
-                .selected(&selected)
+                .chart_focus(&focused)
+                .chart_selection(&selected)
         },
     );
 }
@@ -440,8 +440,8 @@ fn pie_chart_xctest_like_focus_and_selection_flow(ui: UiBuilder) {
         },
         move |focused, selected| {
             PieChart::new(Binding::container(data.clone()))
-                .focused(&focused)
-                .selected(&selected)
+                .chart_focus(&focused)
+                .chart_selection(&selected)
         },
     );
 }

@@ -150,21 +150,17 @@ impl<C> ChartAxes<C> {
         self
     }
 
-    /// Sets padding for axis labels.
+    /// Sets insets for axis labels on all four sides (`top`, `leading`, `bottom`, `trailing`).
     #[must_use]
-    pub const fn padding(mut self, left: f32, bottom: f32) -> Self {
-        self.padding.left = left;
-        self.padding.bottom = bottom;
-        self
-    }
-
-    /// Sets all four padding values.
-    #[must_use]
-    pub const fn padding_all(mut self, left: f32, bottom: f32, top: f32, right: f32) -> Self {
-        self.padding.left = left;
-        self.padding.bottom = bottom;
-        self.padding.top = top;
-        self.padding.right = right;
+    #[expect(
+        clippy::needless_pass_by_value,
+        reason = "builder accepts EdgeInsets by value consistently with ViewExt::list_row_insets"
+    )]
+    pub const fn axis_insets(mut self, insets: EdgeInsets) -> Self {
+        self.padding.left = insets.leading();
+        self.padding.bottom = insets.bottom();
+        self.padding.top = insets.top();
+        self.padding.right = insets.trailing();
         self
     }
 

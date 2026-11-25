@@ -86,26 +86,26 @@ impl<S: Signal<Output = Vec<BubblePoint>>> BubbleChart<S> {
         self
     }
 
-    /// Sets bubble opacity.
+    /// Sets bubble fill opacity.
     ///
     /// Accepts any value convertible into [`UnitInterval`]. Passing a raw
     /// `f32` panics on `NaN`, infinity, or values outside `[0.0, 1.0]`.
     #[must_use]
-    pub fn opacity(mut self, opacity: impl Into<UnitInterval>) -> Self {
+    pub fn fill_opacity(mut self, opacity: impl Into<UnitInterval>) -> Self {
         self.opacity = opacity.into().get();
         self
     }
 
     /// Tracks the currently focused bubble in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<BubblePoint>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<BubblePoint>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected bubble in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<BubblePoint>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<BubblePoint>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }

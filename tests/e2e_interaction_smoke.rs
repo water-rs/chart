@@ -32,8 +32,8 @@ fn line_chart_drag_between_updates_selection_smoke(ui: UiBuilder) {
 
     let mut app = ui.mount_offscreen(move || {
         let chart = LineChart::new(Binding::container(data_for_view.clone()))
-            .focused(&focused_for_view)
-            .selected(&selected_for_view);
+            .chart_focus(&focused_for_view)
+            .chart_selection(&selected_for_view);
         let focused_readout = readout_view(
             "focused",
             focused_for_view.clone(),
@@ -95,8 +95,8 @@ fn pie_chart_hover_and_tap_coordinate_smoke(ui: UiBuilder) {
 
     let mut app = ui.mount_offscreen(move || {
         let chart = PieChart::new(Binding::container(data_for_view.clone()))
-            .focused(&focused_for_view)
-            .selected(&selected_for_view);
+            .chart_focus(&focused_for_view)
+            .chart_selection(&selected_for_view);
         let focused_readout = readout_view(
             "focused",
             focused_for_view.clone(),

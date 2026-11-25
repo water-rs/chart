@@ -29,6 +29,34 @@
 //!     .color(Srgb::from_hex("#3B82F6"))
 //! # }
 //! ```
+//!
+//! # `ViewExt` compatibility
+//!
+//! Inherent chart, axis, and tooltip builders avoid shadowing `ViewExt`
+//! modifiers such as `.size(width, height)`:
+//!
+//! ```rust
+//! use waterui::{
+//!     ViewExt as _,
+//!     layout::{frame::Frame, padding::EdgeInsets},
+//!     prelude::*,
+//! };
+//! use waterui_chart::{
+//!     BarChart, ChartAxes, ChartExt as _, DataBounds, DataPoint, Tooltip, TooltipContent,
+//! };
+//!
+//! let data = binding(vec![DataPoint::new(0.0, 100.0)]);
+//! let bounds = DataBounds::from_points(&[DataPoint::new(0.0, 100.0)]);
+//! let bar_frame: Frame<BarChart<_>> = BarChart::new(data.clone()).size(320.0, 200.0);
+//! let axes_frame: Frame<ChartAxes<_>> = BarChart::new(data)
+//!     .axes(bounds)
+//!     .axis_insets(EdgeInsets::all(16.0))
+//!     .size(320.0, 200.0);
+//! let tooltip_frame: Frame<Tooltip> = Tooltip::new(TooltipContent::new().title("Point"))
+//!     .content_padding(6.0)
+//!     .size(120.0, 48.0);
+//! # let _ = (bar_frame, axes_frame, tooltip_frame);
+//! ```
 
 extern crate alloc;
 
