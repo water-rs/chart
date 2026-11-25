@@ -8,7 +8,7 @@ use waterui::component::{text, vstack};
 use waterui::graphics::color::Srgb;
 use waterui::{Binding, Signal as _, SignalExt as _, View, ViewExt as _};
 use waterui_chart::{DepthChart, DepthSide, LineChart};
-use waterui_testing::{Role, Styled, UiBuilder};
+use waterui_testing::{Role, UiBuilder};
 
 use support::{
     assert_chart_accessibility_ready, chart_surface, depth_data, depth_hit_location,
@@ -104,9 +104,7 @@ fn y_range_readout(selection: Binding<Option<RangeInclusive<f32>>>) -> impl View
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn line_chart_x_selection_updates_continuous_domain_value_on_tap(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn line_chart_x_selection_updates_continuous_domain_value_on_tap(ui: UiBuilder) {
     let data = point_series();
     let selection = Binding::container(None::<f32>);
     let data_for_view = data.clone();
@@ -152,7 +150,7 @@ fn line_chart_x_selection_updates_continuous_domain_value_on_tap(
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn line_chart_x_selection_range_tracks_drag_span(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
+fn line_chart_x_selection_range_tracks_drag_span(ui: UiBuilder) {
     let data = point_series();
     let selection = Binding::container(None::<RangeInclusive<f32>>);
     let data_for_view = data.clone();
@@ -202,9 +200,7 @@ fn line_chart_x_selection_range_tracks_drag_span(ui: UiBuilder<Styled<hydrolysis
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn line_chart_y_selection_updates_continuous_domain_value_on_tap(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn line_chart_y_selection_updates_continuous_domain_value_on_tap(ui: UiBuilder) {
     let data = point_series();
     let selection = Binding::container(None::<f32>);
     let data_for_view = data.clone();
@@ -250,7 +246,7 @@ fn line_chart_y_selection_updates_continuous_domain_value_on_tap(
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn line_chart_y_selection_range_tracks_drag_span(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
+fn line_chart_y_selection_range_tracks_drag_span(ui: UiBuilder) {
     let data = point_series();
     let selection = Binding::container(None::<RangeInclusive<f32>>);
     let data_for_view = data.clone();
@@ -300,9 +296,7 @@ fn line_chart_y_selection_range_tracks_drag_span(ui: UiBuilder<Styled<hydrolysis
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn line_chart_updates_x_and_y_selection_together_on_tap(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn line_chart_updates_x_and_y_selection_together_on_tap(ui: UiBuilder) {
     let data = point_series();
     let x_selection = Binding::container(None::<f32>);
     let y_selection = Binding::container(None::<f32>);
@@ -371,9 +365,7 @@ fn line_chart_updates_x_and_y_selection_together_on_tap(
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn depth_chart_x_selection_tracks_price_domain_on_tap(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn depth_chart_x_selection_tracks_price_domain_on_tap(ui: UiBuilder) {
     let data = depth_data();
     let selection = Binding::container(None::<f32>);
     let data_for_view = data.clone();

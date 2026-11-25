@@ -11,7 +11,7 @@ use waterui_layout::frame::Frame;
 use waterui_layout::padding::{EdgeInsets, Padding};
 use waterui_layout::stack::{HStack, HorizontalAlignment, VStack, VerticalAlignment};
 use waterui_layout::{PositionExt, UnitPoint, absolute};
-use waterui_shape::{RoundedRectangle, ShapeExt};
+use waterui_shape::{CornerRadius, RoundedRectangle, ShapeExt};
 use waterui_text::{IntoText, Text};
 
 use crate::interaction::{ChartViewport, HitResult};
@@ -193,10 +193,12 @@ impl View for Tooltip {
                         )
                     },
                     |color| {
-                        let indicator =
-                            Frame::new(RoundedRectangle::new(0.5).fill(Color::from(color)))
-                                .width(8.0)
-                                .height(8.0);
+                        let indicator = Frame::new(
+                            RoundedRectangle::new(CornerRadius::fraction(0.5))
+                                .fill(Color::from(color)),
+                        )
+                        .width(8.0)
+                        .height(8.0);
                         let line = (val.label.clone() + Text::verbatim(": ") + val.value.clone())
                             .color(text_color.clone());
                         AnyView::new(HStack::new(
@@ -214,8 +216,8 @@ impl View for Tooltip {
                 EdgeInsets::all(self.padding),
                 Frame::new(VStack::new(HorizontalAlignment::Leading, 4.0, views)).min_width(80.0),
             );
-            let background = RoundedRectangle::new(self.corner_radius / 100.0)
-                .fill(Color::from(self.background));
+            let background =
+                RoundedRectangle::new(self.corner_radius).fill(Color::from(self.background));
 
             // Stack content over background
             AnyView::new(Frame::new(waterui_layout::stack::ZStack::new(

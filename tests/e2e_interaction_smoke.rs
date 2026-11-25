@@ -4,7 +4,7 @@ mod support;
 
 use waterui::{Binding, Signal as _};
 use waterui_chart::{HitResult, LineChart, PieChart};
-use waterui_testing::{Styled, UiBuilder};
+use waterui_testing::UiBuilder;
 
 use support::{
     assert_chart_accessibility_ready, assert_label_exists, chart_label, pie_data, pie_hit_location,
@@ -18,9 +18,7 @@ fn chart_labels_are_stable() {
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn line_chart_drag_between_updates_selection_smoke(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn line_chart_drag_between_updates_selection_smoke(ui: UiBuilder) {
     let data = point_series();
     let focused = Binding::container(None::<HitResult<waterui_chart::DataPoint>>);
     let selected = Binding::container(None::<HitResult<waterui_chart::DataPoint>>);
@@ -84,7 +82,7 @@ fn line_chart_drag_between_updates_selection_smoke(
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn pie_chart_hover_and_tap_coordinate_smoke(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
+fn pie_chart_hover_and_tap_coordinate_smoke(ui: UiBuilder) {
     let data = pie_data();
     let focused = Binding::container(None::<HitResult<waterui_chart::SliceDatum>>);
     let selected = Binding::container(None::<HitResult<waterui_chart::SliceDatum>>);
