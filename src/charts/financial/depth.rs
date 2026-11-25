@@ -69,14 +69,14 @@ impl<S: Signal<Output = DepthData>> DepthChart<S> {
 
     /// Tracks the currently focused depth level in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<DepthDatum>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<DepthDatum>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected depth level in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<DepthDatum>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<DepthDatum>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }

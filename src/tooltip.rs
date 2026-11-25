@@ -117,7 +117,7 @@ impl TooltipContent {
 ///         .value("X", "10.5")
 ///         .value("Y", "25.3"),
 /// )
-/// .background(Srgb::from_hex("#1F2937"));
+/// .background_color(Srgb::from_hex("#1F2937"));
 /// ```
 #[derive(Debug)]
 pub struct Tooltip {
@@ -141,9 +141,9 @@ impl Tooltip {
         }
     }
 
-    /// Sets the background color.
+    /// Sets the tooltip fill color.
     #[must_use]
-    pub fn background(mut self, color: impl Into<Srgb>) -> Self {
+    pub fn background_color(mut self, color: impl Into<Srgb>) -> Self {
         self.background = color.into();
         self
     }
@@ -162,9 +162,9 @@ impl Tooltip {
         self
     }
 
-    /// Sets the padding.
+    /// Sets the inner padding around the tooltip content.
     #[must_use]
-    pub const fn padding(mut self, padding: f32) -> Self {
+    pub const fn content_padding(mut self, padding: f32) -> Self {
         self.padding = padding;
         self
     }

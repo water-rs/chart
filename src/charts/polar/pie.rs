@@ -66,14 +66,14 @@ impl<S: Signal<Output = Vec<DataPoint>>> PieChart<S> {
 
     /// Tracks the currently focused slice in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<SliceDatum>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<SliceDatum>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected slice in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<SliceDatum>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<SliceDatum>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }

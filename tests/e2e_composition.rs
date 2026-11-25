@@ -167,7 +167,7 @@ fn chart_overlay_reacts_to_proxy_selection_with_external_binding(ui: UiBuilder) 
         chart_surface(
             "composition-line-external",
             LineChart::new(Binding::container(data.clone()))
-                .selected(&selected_for_view)
+                .chart_selection(&selected_for_view)
                 .chart_overlay(|proxy| {
                     let visible = selected_visibility(proxy);
                     absolute((overlay_badge("External selection overlay")
@@ -232,7 +232,7 @@ fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder) {
         chart_surface(
             "composition-line-tooltip",
             LineChart::new(Binding::container(data.clone()))
-                .selected(&selected_for_view)
+                .chart_selection(&selected_for_view)
                 .chart_overlay({
                     let selected_for_overlay = selected_for_view.clone();
                     move |_proxy| {
@@ -288,7 +288,7 @@ fn selected_tooltip_exposes_accessibility_labels(ui: UiBuilder) {
         chart_surface(
             "composition-line-selected-tooltip",
             LineChart::new(Binding::container(data.clone()))
-                .selected(&selected_for_view)
+                .chart_selection(&selected_for_view)
                 .selected_tooltip(|hit| {
                     waterui_chart::Tooltip::new(
                         waterui_chart::TooltipContent::new()
@@ -296,7 +296,7 @@ fn selected_tooltip_exposes_accessibility_labels(ui: UiBuilder) {
                             .value("Series", format!("{}", hit.series))
                             .value("Index", format!("{}", hit.index)),
                     )
-                    .background(Srgb::new(0.12, 0.18, 0.32))
+                    .background_color(Srgb::new(0.12, 0.18, 0.32))
                 }),
         )
         .background(Srgb::BLACK)
@@ -336,7 +336,7 @@ fn tooltip_component_exposes_accessible_labels(ui: UiBuilder) {
                 .value("Series", "0")
                 .value("Index", "10"),
         )
-        .background(Srgb::new(0.12, 0.18, 0.32))
+        .background_color(Srgb::new(0.12, 0.18, 0.32))
     });
 
     app.query()

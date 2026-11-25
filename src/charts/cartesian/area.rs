@@ -42,14 +42,14 @@ impl<S: Signal<Output = AreaData>> AreaChart<S> {
 
     /// Tracks the currently focused area datum in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<AreaDatum>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<AreaDatum>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected area datum in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<AreaDatum>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<AreaDatum>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }

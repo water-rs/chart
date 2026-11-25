@@ -451,7 +451,7 @@ fn bubble_chart_preview() -> impl View {
     BubbleChart::new(bubbles)
         .min_radius(10.0)
         .max_radius(50.0)
-        .opacity(0.7)
+        .fill_opacity(0.7)
         .size(400.0, 350.0)
 }
 

@@ -64,14 +64,14 @@ impl<S: Signal<Output = ChoroplethData>> ChoroplethChart<S> {
 
     /// Tracks the currently focused region in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<RegionDatum>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<RegionDatum>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected region in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<RegionDatum>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<RegionDatum>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }

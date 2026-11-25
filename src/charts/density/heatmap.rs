@@ -32,14 +32,14 @@ impl<S: Signal<Output = HeatmapData>> HeatmapChart<S> {
 
     /// Tracks the currently focused heatmap cell in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<GridDatum>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<GridDatum>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected heatmap cell in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<GridDatum>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<GridDatum>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }

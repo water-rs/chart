@@ -99,14 +99,14 @@ impl<S: Signal<Output = GaugeData>> GaugeChart<S> {
 
     /// Tracks the currently focused gauge sector in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<SliceDatum>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<SliceDatum>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected gauge sector in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<SliceDatum>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<SliceDatum>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }

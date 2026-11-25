@@ -41,14 +41,14 @@ impl<S: Signal<Output = RadarData>> RadarChart<S> {
 
     /// Tracks the currently focused radar axis in an external binding.
     #[must_use]
-    pub fn focused(mut self, focused: &Binding<Option<HitResult<RadarDatum>>>) -> Self {
+    pub fn chart_focus(mut self, focused: &Binding<Option<HitResult<RadarDatum>>>) -> Self {
         self.selection = self.selection.with_focused(focused);
         self
     }
 
     /// Tracks the currently selected radar axis in an external binding.
     #[must_use]
-    pub fn selected(mut self, selected: &Binding<Option<HitResult<RadarDatum>>>) -> Self {
+    pub fn chart_selection(mut self, selected: &Binding<Option<HitResult<RadarDatum>>>) -> Self {
         self.selection = self.selection.with_selected(selected);
         self
     }
