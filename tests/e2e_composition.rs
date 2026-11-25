@@ -8,7 +8,7 @@ use waterui::graphics::color::Srgb;
 use waterui::layout::{PositionExt, UnitPoint, absolute};
 use waterui::{Binding, Signal as _, SignalExt as _, View, ViewExt as _};
 use waterui_chart::LineChart;
-use waterui_testing::{OffscreenApp, Role, Styled, UiBuilder};
+use waterui_testing::{OffscreenApp, Role, UiBuilder};
 
 use support::{
     CHART_HEIGHT, CHART_WIDTH, assert_chart_accessibility_ready, assert_chart_semantic_ready,
@@ -108,9 +108,7 @@ fn chart_overlay_static_layer_exposes_accessibility_node(ui: UiBuilder) {
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(ui: UiBuilder) {
     let data = point_series();
     let index = 10;
     let location = point_hit_location(&data, index);
@@ -158,9 +156,7 @@ fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn chart_overlay_reacts_to_proxy_selection_with_external_binding(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn chart_overlay_reacts_to_proxy_selection_with_external_binding(ui: UiBuilder) {
     let data = point_series();
     let index = 10;
     let location = point_hit_location(&data, index);
@@ -225,7 +221,7 @@ fn chart_overlay_reactive_layer_is_initially_hidden_without_selection(ui: UiBuil
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
+fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder) {
     let data = point_series();
     let index = 10;
     let location = point_hit_location(&data, index);
@@ -281,7 +277,7 @@ fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder<Styled<hydrolysis
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn selected_tooltip_exposes_accessibility_labels(ui: UiBuilder<Styled<hydrolysis_m3::Material3>>) {
+fn selected_tooltip_exposes_accessibility_labels(ui: UiBuilder) {
     let data = point_series();
     let index = 10;
     let location = point_hit_location(&data, index);

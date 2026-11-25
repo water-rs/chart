@@ -252,13 +252,10 @@ where
             let frame = frame.clone();
             let selection = selection.clone();
             let cartesian_selection = cartesian_selection.clone();
-            move |env: Environment| {
+            move |tap: TapEvent| {
                 if !selection.is_active() && !cartesian_selection.is_active() {
                     return;
                 }
-                let tap = env
-                    .get::<TapEvent>()
-                    .expect("interactive_cartesian_signal_canvas: TapEvent missing from gesture environment");
                 let location = tap.location();
                 let point = Point::new(location.x, location.y);
                 let Frame { geometry, .. } = frame.snapshot();
@@ -285,7 +282,7 @@ where
             let cartesian_viewport = cartesian_viewport;
             let x_range_start = x_range_start;
             let y_range_start = y_range_start;
-            move |env: Environment| {
+            move |drag_event: DragEvent| {
                 let handles_selection_drag = selection.is_active()
                     || cartesian_selection.is_active()
                     || (!cartesian_viewport.allows_horizontal_drag()
@@ -297,9 +294,6 @@ where
                     return;
                 }
 
-                let drag_event = env.get::<DragEvent>().expect(
-                    "interactive_cartesian_signal_canvas: DragEvent missing from gesture environment",
-                );
                 let Frame { geometry, .. } = frame.snapshot();
                 let location = drag_event.location();
                 let point = Point::new(location.x, location.y);
@@ -531,13 +525,10 @@ where
         GestureObserver::new(TapGesture::new(), {
             let frame = frame.clone();
             let selection = selection.clone();
-            move |env: Environment| {
+            move |tap: TapEvent| {
                 if !selection.is_active() {
                     return;
                 }
-                let tap = env
-                    .get::<TapEvent>()
-                    .expect("interactive_signal_canvas: TapEvent missing from gesture environment");
                 let location = tap.location();
                 let hit = frame
                     .snapshot()
@@ -553,13 +544,10 @@ where
         GestureObserver::new(DragGesture::new(0.0), {
             let frame = frame.clone();
             let selection = selection.clone();
-            move |env: Environment| {
+            move |drag_event: DragEvent| {
                 if !selection.is_active() {
                     return;
                 }
-                let drag_event = env.get::<DragEvent>().expect(
-                    "interactive_signal_canvas: DragEvent missing from gesture environment",
-                );
                 let hit_at = || {
                     let location = drag_event.location();
                     frame
@@ -602,13 +590,10 @@ where
         OnEvent::new(Event::HoverMove, {
             let frame = frame.clone();
             let selection = selection.clone();
-            move |env: Environment| {
+            move |hover: HoverEvent| {
                 if !selection.is_active() {
                     return;
                 }
-                let hover = env
-                    .get::<HoverEvent>()
-                    .expect("hover_events: HoverEvent missing from event environment");
                 let hit = frame.snapshot().geometry.hit_test(hover.location());
                 selection.set_focus(hit);
             }

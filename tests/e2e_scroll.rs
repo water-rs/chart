@@ -6,7 +6,7 @@ use waterui::component::{text, vstack};
 use waterui::graphics::color::Srgb;
 use waterui::{Binding, Signal as _, SignalExt as _, View, ViewExt as _};
 use waterui_chart::{ChartScrollableAxes, DataBounds, LineChart};
-use waterui_testing::{Role, Selector, Styled, UiBuilder, WaitOptions, WaitResult};
+use waterui_testing::{Role, UiBuilder};
 
 use support::{
     assert_chart_accessibility_ready, assert_chart_semantic_ready, chart_surface,
@@ -44,9 +44,7 @@ fn scalar_readout(prefix: &'static str, binding: Binding<f32>) -> impl View {
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn line_chart_horizontal_drag_updates_scroll_position_binding(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn line_chart_horizontal_drag_updates_scroll_position_binding(ui: UiBuilder) {
     let data = point_series();
     let bounds = DataBounds::from_points(&data).with_padding(0.1);
     let visible_length = 8.0_f32;
@@ -96,9 +94,7 @@ fn line_chart_horizontal_drag_updates_scroll_position_binding(
 }
 
 #[waterui::test(theme = hydrolysis_m3::Material3::defaults(), viewport = (320, 320))]
-fn line_chart_vertical_drag_updates_scroll_position_binding(
-    ui: UiBuilder<Styled<hydrolysis_m3::Material3>>,
-) {
+fn line_chart_vertical_drag_updates_scroll_position_binding(ui: UiBuilder) {
     let data = point_series();
     let bounds = DataBounds::from_points(&data).with_padding(0.1);
     let visible_length = 10.0_f32;
@@ -181,10 +177,10 @@ fn line_chart_reactive_visible_domain_length_triggers_redraw(ui: UiBuilder) {
     assert_chart_semantic_ready(&mut app, "line-visible-domain-reactive");
     visible_length.set(4.0);
     assert!(
-        app.wait_for(
-            &[app.expect_exists(Selector::default().role(Role::LABEL).label("visible:4.00"),)],
-            WaitOptions::new(std::time::Duration::from_millis(200)),
-        ) == WaitResult::Completed,
+        app.query()
+            .role(Role::LABEL)
+            .label("visible:4.00")
+            .wait_for_existence(std::time::Duration::from_millis(200)),
         "line-visible-domain-reactive: visible-domain readout should update after binding change"
     );
     assert_close(
