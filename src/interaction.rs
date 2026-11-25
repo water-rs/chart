@@ -2,7 +2,7 @@
 
 use core::ops::RangeInclusive;
 
-use nami::{Binding, Computed, Signal, SignalExt as _};
+use nami::{Binding, Computed, Signal, SignalExt as _, binding};
 use waterui_core::{IntoSignalF32, layout::Point};
 
 /// Stable screen-space anchor for chart readouts and overlays.
@@ -371,8 +371,8 @@ impl Default for CartesianViewportBindings {
             scrollable_axes: ChartScrollableAxes::none(),
             x_visible_length: Computed::constant(None),
             y_visible_length: Computed::constant(None),
-            x_position: Binding::f32(0.0),
-            y_position: Binding::f32(0.0),
+            x_position: binding(0.0_f32),
+            y_position: binding(0.0_f32),
             x_flags: AxisViewportBindingFlags::default(),
             y_flags: AxisViewportBindingFlags::default(),
         }
@@ -771,8 +771,8 @@ impl<T: Clone + PartialEq + 'static> SelectionBindings<T> {
     #[must_use]
     pub fn new() -> Self {
         Self {
-            focused: Binding::container(None),
-            selected: Binding::container(None),
+            focused: binding(None),
+            selected: binding(None),
             focused_flags: SelectionBindingFlags::default(),
             selected_flags: SelectionBindingFlags::default(),
         }
@@ -793,10 +793,10 @@ impl<T: Clone + PartialEq + 'static> SelectionBindings<T> {
     #[must_use]
     pub fn persist_internal(mut self) -> Self {
         if !self.focused_flags.external {
-            self.focused = Binding::container(None::<HitResult<T>>);
+            self.focused = binding(None::<HitResult<T>>);
         }
         if !self.selected_flags.external {
-            self.selected = Binding::container(None::<HitResult<T>>);
+            self.selected = binding(None::<HitResult<T>>);
         }
         self
     }
