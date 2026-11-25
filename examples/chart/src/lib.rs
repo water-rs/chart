@@ -1,7 +1,7 @@
 //! Chart example demonstrating all chart types.
 
 use waterui::app::{App, Windows};
-use waterui::layout::grid::{grid as layout_grid, row};
+use waterui::layout::grid::{grid as layout_grid, grid_row};
 use waterui::prelude::*;
 use waterui::preview;
 use waterui::reactive::{binding, impl_constant, Binding};
@@ -91,27 +91,27 @@ fn mode_controls(mode: &Binding<ChartMode>) -> impl View {
     layout_grid(
         3,
         [
-            row((
+            grid_row((
                 mode_button(mode, ChartMode::Bar),
                 mode_button(mode, ChartMode::Line),
                 mode_button(mode, ChartMode::Pie),
             )),
-            row((
+            grid_row((
                 mode_button(mode, ChartMode::Scatter),
                 mode_button(mode, ChartMode::Candlestick),
                 mode_button(mode, ChartMode::Depth),
             )),
-            row((
+            grid_row((
                 mode_button(mode, ChartMode::Heatmap),
                 mode_button(mode, ChartMode::Contour),
                 mode_button(mode, ChartMode::Radar),
             )),
-            row((
+            grid_row((
                 mode_button(mode, ChartMode::Bubble),
                 mode_button(mode, ChartMode::Area),
                 mode_button(mode, ChartMode::Gauge),
             )),
-            row((
+            grid_row((
                 mode_button(mode, ChartMode::StressScatter10K),
                 mode_button(mode, ChartMode::StressLine1K),
                 mode_button(mode, ChartMode::StressHeatmap10K),
