@@ -124,7 +124,7 @@ fn chart_overlay_reacts_to_proxy_selection_without_external_bindings(ui: UiBuild
                 let visible = selected_visibility(proxy.clone());
                 absolute((overlay_badge("Proxy selection overlay")
                     .position_anchor(UnitPoint::TOP_LEADING, 24.0, 24.0)
-                    .a11y_state_signal(hidden_accessibility_state(visible))
+                    .a11y_state(hidden_accessibility_state(visible))
                     .on_change(&proxy.selected(), {
                         let proxy_selected_binding = proxy_selected_binding.clone();
                         move |value| proxy_selected_binding.set(value)
@@ -172,7 +172,7 @@ fn chart_overlay_reacts_to_proxy_selection_with_external_binding(ui: UiBuilder) 
                     let visible = selected_visibility(proxy);
                     absolute((overlay_badge("External selection overlay")
                         .position_anchor(UnitPoint::TOP_LEADING, 24.0, 24.0)
-                        .a11y_state_signal(hidden_accessibility_state(visible)),))
+                        .a11y_state(hidden_accessibility_state(visible)),))
                 }),
         )
         .background(Srgb::BLACK)
@@ -208,7 +208,7 @@ fn chart_overlay_reactive_layer_is_initially_hidden_without_selection(ui: UiBuil
                 let visible = selected_visibility(proxy);
                 absolute((overlay_badge("Hidden overlay")
                     .position_anchor(UnitPoint::TOP_LEADING, 24.0, 24.0)
-                    .a11y_state_signal(hidden_accessibility_state(visible)),))
+                    .a11y_state(hidden_accessibility_state(visible)),))
             }),
         )
         .background(Srgb::BLACK)
@@ -254,7 +254,7 @@ fn selected_overlay_exposes_accessibility_labels(ui: UiBuilder) {
                             .padding_with(6.0)
                             .background(Srgb::new(0.12, 0.18, 0.32))
                             .position_anchor(UnitPoint::TOP_LEADING, 24.0, 24.0)
-                            .a11y_state_signal(hidden_accessibility_state(visible)),))
+                            .a11y_state(hidden_accessibility_state(visible)),))
                     }
                 }),
         )
